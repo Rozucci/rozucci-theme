@@ -9,8 +9,9 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
 import CellGrid from '../../../components/CellGrid.astro';
 import SectionHead from '../../../components/SectionHead.astro';
 import ProjectCard from '../../../components/ProjectCard.astro';
+import FilterBar from '../../../components/FilterBar.astro';
 import type { LocaleCode } from '../../../site.config';
-import { code, localeStaticPaths, num, useTranslations } from '../../../i18n/utils';
+import { localeStaticPaths, useTranslations } from '../../../i18n/utils';
 import { DISCIPLINES } from '../../../data/disciplines';
 import { getProjects, projectHref } from '../../../lib/projects';
 
@@ -35,20 +36,9 @@ const filters = [{ key: 'all', name: t.actions.all, n: count() }].concat(
   <section class="section section--flush" aria-labelledby="work-title">
     <SectionHead index={1} id="work-title" level="h1" size="2xl" title={t.work.title} lead={t.work.intro} />
 
-    <div class="work-filters pad u-js-only" role="group" aria-label={t.work.filterLabel} data-work-filters>
-      {
-        filters.map((f, i) => (
-          <button type="button" class="work-filter t-label" data-filter={f.key} aria-pressed={i === 0 ? 'true' : 'false'}>
-            <span class="work-filter__name">{f.name}</span>&nbsp;<bdi lang="en" class="work-filter__n">({code(f.n)})</bdi>
-          </button>
-        ))
-      }
-    </div>
-    <p class="visually-hidden" aria-live="polite" data-work-status data-label={t.work.count} data-lang={locale}>
-      {num(projects.length, locale)} {t.work.count}
-    </p>
+    <FilterBar label={t.work.filterLabel} param="d" items={filters} countLabel={t.work.count} locale={locale} />
 
-    <CellGrid cols={3} as="ul" data-work-grid>
+    <CellGrid cols={3} as="ul" data-filter-grid>
       {
         projects.map((p, i) => (
           <ProjectCard
@@ -70,58 +60,9 @@ const filters = [{ key: 'all', name: t.actions.all, n: count() }].concat(
   </section>
 </BaseLayout>
 
-<style>
-  @layer components {
-    .work-filters {
-      display: flex;
-      flex-wrap: wrap;
-      gap: var(--space-xs) var(--space-lg);
-      padding-block: var(--space-md);
-      border-block-start: var(--line-width) solid var(--color-line);
-      border-block-end: var(--line-width) solid var(--color-line);
-    }
-
-    .work-filter {
-      display: inline-flex;
-      align-items: center;
-      min-block-size: var(--hit-target);
-      color: var(--color-ink-muted);
-      transition: color var(--dur-hover) var(--ease-standard);
-    }
-
-    .work-filter::before {
-      content: '[\00a0';
-      visibility: hidden;
-    }
-
-    .work-filter::after {
-      content: '\00a0]';
-      visibility: hidden;
-    }
-
-    .work-filter:hover,
-    .work-filter[aria-pressed='true'] {
-      color: var(--color-ink);
-    }
-
-    .work-filter[aria-pressed='true']::before,
-    .work-filter[aria-pressed='true']::after {
-      visibility: visible;
-    }
-
-    .work-filter__n {
-      color: var(--color-ink-muted);
-    }
-
-    /* Filtered-out cells. A class (not [hidden]) so Flip can animate them out. */
-    :global(.is-out) {
-      display: none;
-    }
-  }
-</style>
 
 <script>
-  import { initWorkFilter } from '../../../scripts/work-filter';
+  import { initFilter } from '../../../scripts/filter';
   import { onPageLoad } from '../../../scripts/lifecycle';
-  onPageLoad(initWorkFilter);
+  onPageLoad(initFilter);
 </script>

@@ -1,8 +1,9 @@
 ---
 /**
  * Header — a single hairline row of cells: wordmark · text-only nav ·
- * language · colour mode. Sticky; on narrow screens the nav drops to its own
- * row. The current page is bracketed: [ WORK ].
+ * cart (when the store is enabled) · language · colour mode. Sticky; on
+ * narrow screens the nav drops to its own row. The current page is
+ * bracketed: [ WORK ].
  */
 import LanguageSwitcher from './LanguageSwitcher.astro';
 import ThemeToggle from './ThemeToggle.astro';
@@ -47,6 +48,14 @@ const items = site.nav.map((item) => ({
     </ul>
   </nav>
 
+  {
+    site.store.enabled && (
+      <a class="site-header__cart cell t-label" href={localizePath('/cart/', locale)}>
+        <span>{t.store.cart}</span>
+        <bdi lang="en">[&nbsp;<span data-cart-count>00</span>&nbsp;]</bdi>
+      </a>
+    )
+  }
   <div class="site-header__lang cell">
     <LanguageSwitcher locale={locale} />
   </div>
@@ -62,10 +71,10 @@ const items = site.nav.map((item) => ({
       inset-block-start: 0;
       z-index: var(--z-header);
       display: grid;
-      grid-template-columns: minmax(0, 1fr) auto auto;
+      grid-template-columns: minmax(0, 1fr) auto auto auto;
       grid-template-areas:
-        'brand lang mode'
-        'nav nav nav';
+        'brand cart lang mode'
+        'nav nav nav nav';
       background: var(--color-canvas);
       border-block-end: var(--line-width) solid var(--color-line);
     }
@@ -102,6 +111,31 @@ const items = site.nav.map((item) => ({
       gap: var(--space-lg);
       margin: 0;
       padding: 0;
+    }
+
+    .site-header__cart {
+      grid-area: cart;
+      gap: var(--space-xs);
+      color: var(--color-ink);
+      text-decoration: none;
+      border-inline-start: var(--line-width) solid var(--color-line);
+      white-space: nowrap;
+    }
+
+    .site-header__cart:hover {
+      background: var(--color-surface);
+    }
+
+    /* Narrow screens: keep the count, hide the word (still read aloud). */
+    @media (max-width: 47.99rem) {
+      .site-header__cart > span:first-child {
+        position: absolute;
+        inline-size: 1px;
+        block-size: 1px;
+        overflow: hidden;
+        clip-path: inset(50%);
+        white-space: nowrap;
+      }
     }
 
     .site-header__lang {
@@ -149,8 +183,8 @@ const items = site.nav.map((item) => ({
 
     @media (min-width: 48rem) {
       .site-header {
-        grid-template-columns: minmax(0, 1fr) minmax(0, 3fr) auto auto;
-        grid-template-areas: 'brand nav lang mode';
+        grid-template-columns: minmax(0, 1fr) minmax(0, 3fr) auto auto auto;
+        grid-template-areas: 'brand nav cart lang mode';
       }
 
       .site-header__nav {

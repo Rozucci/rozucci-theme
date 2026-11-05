@@ -1,0 +1,113 @@
+---
+/**
+ * Button — zero radius, hairline border, label typography.
+ *
+ *   primary   — reads --button-* tokens (filled ink by default; a theme can
+ *               make it an outline button, e.g. studio)
+ *   secondary — always an outline
+ *   ghost     — text only
+ *
+ * Renders <a> when `href` is set, otherwise <button>.
+ */
+import Arrow from './Arrow.astro';
+
+interface Props {
+  href?: string;
+  type?: 'button' | 'submit' | 'reset';
+  variant?: 'primary' | 'secondary' | 'ghost';
+  sign?: string;
+  arrow?: boolean;
+  full?: boolean;
+  class?: string;
+  [key: string]: unknown;
+}
+
+const {
+  href,
+  type = 'button',
+  variant = 'primary',
+  sign,
+  arrow = false,
+  full = false,
+  class: className,
+  ...rest
+} = Astro.props;
+const Tag = href ? 'a' : 'button';
+---
+
+<Tag
+  class:list={['btn', `btn--${variant}`, 't-label', { 'btn--full': full }, className]}
+  href={href}
+  type={href ? undefined : type}
+  {...rest}
+>
+  {sign && <bdi lang="en" aria-hidden="true">{sign}</bdi>}
+  <span class="btn__text"><slot /></span>
+  {arrow && <Arrow />}
+</Tag>
+
+<style>
+  @layer components {
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-xs);
+      min-block-size: var(--button-height);
+      padding-inline: var(--space-lg);
+      border: var(--line-width) solid var(--color-line-strong);
+      border-radius: var(--radius);
+      color: var(--color-ink);
+      text-decoration: none;
+      white-space: nowrap;
+      cursor: pointer;
+      transition:
+        background-color var(--dur-fast) var(--ease-standard),
+        color var(--dur-fast) var(--ease-standard),
+        border-color var(--dur-fast) var(--ease-standard);
+    }
+
+    .btn--full {
+      inline-size: 100%;
+    }
+
+    .btn--primary {
+      background: var(--button-bg);
+      color: var(--button-ink);
+      border-color: var(--button-border);
+    }
+
+    .btn--primary:hover {
+      background: var(--button-hover-bg);
+      color: var(--button-hover-ink);
+    }
+
+    .btn--secondary {
+      background: transparent;
+    }
+
+    .btn--secondary:hover {
+      border-color: var(--color-ink);
+      background: var(--color-surface);
+    }
+
+    .btn--ghost {
+      border-color: transparent;
+      padding-inline: var(--space-xs);
+    }
+
+    .btn--ghost:hover .btn__text {
+      text-decoration: underline;
+      text-decoration-thickness: var(--line-width);
+      text-underline-offset: 0.25em;
+    }
+
+    .btn:disabled,
+    .btn[aria-disabled='true'] {
+      cursor: not-allowed;
+      background: transparent;
+      color: var(--color-ink-muted);
+      border-color: var(--color-line);
+    }
+  }
+</style>

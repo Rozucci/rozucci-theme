@@ -1,0 +1,25 @@
+---
+/**
+ * AnnouncementBar — one thin line above the header. Text from i18n
+ * (`announcement`); switched on/off in site.config → announcement.
+ */
+interface Props {
+  text: string;
+}
+
+const { text } = Astro.props;
+---
+
+<p class="announce t-label">{text}</p>
+
+<style>
+  @layer components {
+    .announce {
+      padding: var(--space-xs) var(--gutter);
+      text-align: center;
+      color: var(--color-ink-muted);
+      border-block-end: var(--line-width) solid var(--color-line);
+      background: var(--color-canvas);
+    }
+  }
+</style>

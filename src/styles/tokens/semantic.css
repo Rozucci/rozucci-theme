@@ -14,6 +14,7 @@
     color-scheme: light dark;
 
     /* -------- Colour roles (themes override all of these) -------- */
+    --color-ground: Canvas; /* outside the framed page (boxed themes) */
     --color-canvas: Canvas; /* page ground */
     --color-surface: Canvas; /* cards, table heads, hover fills */
     --color-surface-2: Canvas; /* raised / darker ground (NotchCard row) */
@@ -37,12 +38,32 @@
     --color-notch-label: GrayText;
     --color-notch-line: GrayText;
 
-    /* -------- Type -------- */
+    /* -------- Type: faces --------
+     * Themes remap the *-latin pieces (and --font-fa). The composed roles
+     * (--font-display / -text / -mono) are rebuilt per language below, so a
+     * theme's choice reaches every element while Persian keeps Vazirmatn first.
+     */
     --font-fa: var(--p-font-vazirmatn), var(--p-font-system-sans);
     --font-brand: var(--p-font-brand), var(--p-font-system-serif); /* wordmark */
-    --font-display: var(--p-font-instrument), var(--p-font-vazirmatn), var(--p-font-system-serif);
-    --font-text: var(--p-font-inter), var(--p-font-vazirmatn), var(--p-font-system-sans);
-    --font-mono: var(--p-font-roboto-mono), var(--p-font-vazirmatn), var(--p-font-system-mono);
+    --font-display-latin: var(--p-font-instrument), var(--p-font-system-serif);
+    --font-text-latin: var(--p-font-inter), var(--p-font-system-sans);
+    --font-mono-latin: var(--p-font-roboto-mono), var(--p-font-system-mono);
+
+    --font-display: var(--font-display-latin), var(--font-fa);
+    --font-text: var(--font-text-latin), var(--font-fa);
+    --font-mono: var(--font-mono-latin), var(--font-fa);
+
+    /* Display style pieces (Latin). Persian values are fixed below. */
+    --weight-display-latin: var(--p-weight-400);
+    --weight-display-fa: var(--p-weight-300);
+    --tracking-display-latin: var(--p-tracking-tight);
+    --leading-display-latin: var(--p-leading-0-95);
+    --leading-heading-latin: var(--p-leading-1-1);
+    --display-transform: none; /* uppercase for all-caps display themes */
+    --label-transform: uppercase;
+    --label-tracking-latin: var(--p-tracking-label);
+    --em-style: italic; /* <em> inside headlines */
+    --em-color: inherit;
 
     --text-2xs: var(--p-size-11); /* mono labels */
     --text-xs: var(--p-size-12);
@@ -56,19 +77,19 @@
     --text-display: var(--p-size-fluid-56-168);
     --text-wordmark: var(--p-size-wordmark);
 
-    --leading-display: var(--p-leading-0-95);
-    --leading-heading: var(--p-leading-1-1);
+    --leading-display: var(--leading-display-latin);
+    --leading-heading: var(--leading-heading-latin);
     --leading-snug: var(--p-leading-1-25);
     --leading-label: var(--p-leading-1-4);
     --leading-body: var(--p-leading-1-55);
 
-    --weight-display: var(--p-weight-400);
+    --weight-display: var(--weight-display-latin);
     --weight-text: var(--p-weight-400);
     --weight-strong: var(--p-weight-500);
     --weight-label: var(--p-weight-400);
 
-    --tracking-display: var(--p-tracking-tight);
-    --label-tracking: var(--p-tracking-label);
+    --tracking-display: var(--tracking-display-latin);
+    --label-tracking: var(--label-tracking-latin);
 
     /* -------- Space -------- */
     --space-0: var(--p-space-0);
@@ -119,6 +140,20 @@
     --notch-media-ratio: 1; /* media height ÷ media width (1 = square) */
     --notch-dot: var(--p-size-6);
 
+    /* -------- Theme customisation knobs --------
+     * Layout-level switches a theme may flip. All are plain values, so a
+     * theme changes the *structure* of the look without touching components.
+     */
+    --frame-inset: 0px; /* > 0 floats the page as a box on --color-ground */
+    --frame-border-block: 0px; /* top/bottom page border (boxed themes) */
+    --cell-gap: 0px; /* 0 = collapsed hairline grid; > 0 = separate boxes */
+    --cell-border: 0px; /* border on every cell when boxed */
+    --cell-rule: var(--line-width); /* collapsed-grid hairline; 0 when boxed */
+    --cell-grid-pad: 0px; /* breathing room around a boxed grid */
+    --media-filter: none; /* e.g. grayscale(1) for a monochrome theme */
+    --media-filter-hover: none;
+    --button-height: var(--p-size-44);
+
     /* -------- Motion -------- */
     --dur-instant: var(--p-dur-0);
     --dur-fast: var(--p-dur-200);
@@ -151,6 +186,19 @@
     --dir-sign: 1;
   }
 
+  /*
+   * Defaults that derive from colour roles. Declared on every themed element
+   * too, so a scoped preview (<div data-theme="sage">) recomputes them.
+   */
+  :root,
+  [data-theme] {
+    --button-bg: var(--color-ink); /* primary button: filled ink… */
+    --button-ink: var(--color-canvas);
+    --button-border: var(--color-ink);
+    --button-hover-bg: var(--color-canvas); /* …inverts on hover */
+    --button-hover-ink: var(--color-ink);
+  }
+
   /* Manual mode override from ThemeToggle. */
   :root[data-mode='light'] {
     color-scheme: light;
@@ -173,32 +221,36 @@
   }
 
   /*
+   * Per-language composition.
    * Persian: Vazirmatn leads every stack so spacing and punctuation match the
-   * script; Latin runs fall through to the same face's Latin glyphs.
-   * Letter-spacing is removed — tracking breaks Arabic-script joining.
+   * script; Latin runs fall through to the theme's Latin faces. Letter-spacing
+   * and case transforms are removed — tracking breaks Arabic-script joining.
    */
   :lang(fa) {
-    --font-display: var(--p-font-vazirmatn), var(--p-font-instrument), var(--p-font-system-sans);
-    --font-text: var(--p-font-vazirmatn), var(--p-font-inter), var(--p-font-system-sans);
+    --font-display: var(--font-fa), var(--font-display-latin);
+    --font-text: var(--font-fa), var(--font-text-latin);
     /* Persian labels set in Vazirmatn (mono spaces are too wide between
        Persian words). Codes inside them use <bdi lang="en"> → mono again. */
-    --font-mono: var(--p-font-vazirmatn), var(--p-font-roboto-mono), var(--p-font-system-mono);
-    --weight-display: var(--p-weight-300);
+    --font-mono: var(--font-fa), var(--font-mono-latin);
+    --weight-display: var(--weight-display-fa);
     --leading-display: var(--p-leading-1-25);
     --leading-heading: var(--p-leading-1-4);
     --leading-snug: var(--p-leading-1-55);
     --leading-body: var(--p-leading-1-9);
     --tracking-display: var(--p-tracking-0);
     --label-tracking: var(--p-tracking-0);
+    --em-style: normal; /* no italics in Arabic script */
   }
 
-  /* Latin islands inside Persian pages get their Latin faces back. */
+  /* Latin (pages and islands inside Persian text) rebuild from the pieces. */
   :lang(en) {
-    --font-display: var(--p-font-instrument), var(--p-font-vazirmatn), var(--p-font-system-serif);
-    --font-text: var(--p-font-inter), var(--p-font-vazirmatn), var(--p-font-system-sans);
-    --font-mono: var(--p-font-roboto-mono), var(--p-font-vazirmatn), var(--p-font-system-mono);
-    --weight-display: var(--p-weight-400);
-    --tracking-display: var(--p-tracking-tight);
-    --label-tracking: var(--p-tracking-label);
+    --font-display: var(--font-display-latin), var(--font-fa);
+    --font-text: var(--font-text-latin), var(--font-fa);
+    --font-mono: var(--font-mono-latin), var(--font-fa);
+    --weight-display: var(--weight-display-latin);
+    --leading-display: var(--leading-display-latin);
+    --leading-heading: var(--leading-heading-latin);
+    --tracking-display: var(--tracking-display-latin);
+    --label-tracking: var(--label-tracking-latin);
   }
 }

@@ -11,6 +11,7 @@
 @layer tokens.themes {
   :root,
   [data-theme='ivory'] {
+    --color-ground: light-dark(var(--p-ivory-50), var(--p-night-900));
     --color-canvas: light-dark(var(--p-ivory-50), var(--p-night-900));
     --color-surface: light-dark(var(--p-ivory-100), var(--p-night-850));
     --color-surface-2: light-dark(var(--p-ivory-200), var(--p-night-800));

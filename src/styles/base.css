@@ -3,7 +3,7 @@
  */
 @layer base {
   html {
-    background: var(--color-canvas);
+    background: var(--color-ground);
     color: var(--color-ink);
     font-family: var(--font-text);
     font-size: 100%;
@@ -12,7 +12,7 @@
   }
 
   body {
-    background: var(--color-canvas);
+    background: var(--color-ground);
     color: var(--color-ink);
     font-family: var(--font-text);
     font-size: var(--text-base);
@@ -30,7 +30,14 @@
     font-weight: var(--weight-display);
     line-height: var(--leading-heading);
     letter-spacing: var(--tracking-display);
+    text-transform: var(--display-transform);
     text-wrap: balance;
+  }
+
+  /* Emphasis inside headlines: italic in Latin themes, never in Persian. */
+  :is(h1, h2, h3, h4, .t-display, .t-3xl, .t-2xl, .t-xl) em {
+    font-style: var(--em-style);
+    color: var(--em-color);
   }
 
   h1 {

@@ -1,0 +1,99 @@
+---
+/**
+ * VariantPicker — options as text-sign radios: ( ) 30 ml / (•) 50 ml.
+ * Native radios stay accessible (visually hidden); each option can carry its
+ * own price, which the product page shows when it is selected.
+ */
+import { formatPrice } from '../lib/price';
+
+interface Props {
+  legend: string;
+  name?: string;
+  options: { id: string; label: string; price?: number }[];
+  basePrice: number;
+}
+
+const { legend, name = 'variant', options, basePrice } = Astro.props;
+---
+
+<fieldset class="variants">
+  <legend class="t-label u-muted variants__legend">{legend}</legend>
+  <div class="variants__list">
+    {
+      options.map((o, i) => (
+        <label class="variants__option">
+          <input
+            class="visually-hidden"
+            type="radio"
+            name={name}
+            value={o.id}
+            checked={i === 0}
+            data-price={o.price ?? basePrice}
+          />
+          <span class="variants__sign" lang="en" aria-hidden="true" />
+          <span class="variants__label">{o.label}</span>
+          <bdi lang="en" class="variants__price t-label u-muted">{formatPrice(o.price ?? basePrice)}</bdi>
+        </label>
+      ))
+    }
+  </div>
+</fieldset>
+
+<style>
+  @layer components {
+    .variants {
+      border: 0;
+      padding: 0;
+      margin: 0;
+      min-inline-size: 0;
+    }
+
+    .variants__legend {
+      padding: 0;
+      margin-block-end: var(--space-sm);
+    }
+
+    .variants__list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-xs) var(--space-xl);
+    }
+
+    .variants__option {
+      display: inline-flex;
+      align-items: baseline;
+      gap: var(--space-xs);
+      min-block-size: var(--hit-target);
+      cursor: pointer;
+    }
+
+    .variants__sign {
+      font-family: var(--font-mono);
+      color: var(--color-ink-muted);
+    }
+
+    .variants__sign::before {
+      content: '(\00a0)';
+      white-space: pre;
+    }
+
+    input:checked + .variants__sign {
+      color: var(--color-ink);
+    }
+
+    input:checked + .variants__sign::before {
+      content: '(●)';
+    }
+
+    input:focus-visible + .variants__sign {
+      outline: var(--line-width-strong) solid var(--color-focus);
+      outline-offset: var(--line-width-strong);
+    }
+
+    input:checked ~ .variants__label {
+      text-decoration: underline;
+      text-decoration-thickness: var(--line-width);
+      text-underline-offset: 0.3em;
+    }
+  }
+</style>

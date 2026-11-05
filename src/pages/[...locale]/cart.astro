@@ -1,0 +1,276 @@
+---
+/**
+ * Cart (store demo). Lines come from localStorage; product data is embedded
+ * as JSON at build time and rows are cloned from a <template>. Checkout is
+ * intentionally disabled — connect a commerce backend later (README).
+ */
+import { getImage } from 'astro:assets';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SectionHead from '../../components/SectionHead.astro';
+import Button from '../../components/Button.astro';
+import Label from '../../components/Label.astro';
+import type { LocaleCode } from '../../site.config';
+import { site } from '../../site.config';
+import { localeStaticPaths, localizePath, useTranslations } from '../../i18n/utils';
+import { getProducts, productHref, productSlug } from '../../lib/products';
+
+export function getStaticPaths() {
+  return localeStaticPaths();
+}
+
+interface Props {
+  locale: LocaleCode;
+}
+
+const { locale } = Astro.props;
+const t = useTranslations(locale);
+const products = await getProducts(locale);
+
+const catalog: Record<string, unknown> = {};
+for (const p of products) {
+  const thumb = await getImage({ src: p.data.images[0]!.src, width: 160, format: 'webp' });
+  catalog[productSlug(p)] = {
+    title: p.data.title,
+    href: productHref(p),
+    image: thumb.src,
+    price: p.data.price,
+    variants: Object.fromEntries(p.data.variants.map((v) => [v.id, { label: v.label, price: v.price ?? p.data.price }])),
+  };
+}
+---
+
+<BaseLayout locale={locale} title={t.store.cart} noindex>
+  <section class="section section--flush" aria-labelledby="cart-title">
+    <SectionHead index={1} id="cart-title" level="h1" size="2xl" title={t.store.cart} />
+
+    <div
+      class="cart pad"
+      data-cart
+      data-price-locale={site.store.priceLocale}
+      data-currency={site.store.currency}
+      data-lang={locale === 'fa' ? 'fa-IR' : 'en'}
+    >
+      <noscript><p class="u-muted">{t.store.needsJs}</p></noscript>
+
+      <div class="cart__empty u-js-only" data-cart-empty hidden>
+        <p class="t-lg">{t.store.cartEmpty}</p>
+        <Button href={localizePath('/shop/', locale)} variant="secondary" arrow>{t.store.continue}</Button>
+      </div>
+
+      <div class="cart__full" data-cart-full hidden>
+        <div class="scroll-x">
+          <table class="cart__table">
+            <thead>
+              <tr>
+                <th scope="col" class="t-label">{t.store.item}</th>
+                <th scope="col" class="t-label">{t.store.quantity}</th>
+                <th scope="col" class="t-label cart__num">{t.store.total}</th>
+                <th scope="col"><span class="visually-hidden">{t.store.remove}</span></th>
+              </tr>
+            </thead>
+            <tbody data-cart-rows></tbody>
+          </table>
+        </div>
+
+        <div class="cart__summary">
+          <div class="cart__subtotal">
+            <Label tone="ink">{t.store.subtotal}</Label>
+            <bdi lang="en" class="cart__money" data-cart-subtotal>—</bdi>
+          </div>
+          <Button full disabled aria-describedby="checkout-note">{t.store.checkout}</Button>
+          <p id="checkout-note" class="t-label u-muted">{t.store.checkoutNote}</p>
+          <Button href={localizePath('/shop/', locale)} variant="ghost" arrow>{t.store.continue}</Button>
+        </div>
+      </div>
+
+      <template data-cart-row>
+        <tr>
+          <td>
+            <a class="cart__item" data-href>
+              <img class="cart__thumb" alt="" width="64" height="80" data-image />
+              <span class="cart__text">
+                <span class="cart__title" data-title></span>
+                <span class="t-label u-muted" data-variant></span>
+              </span>
+            </a>
+          </td>
+          <td>
+            <div class="qty-mini" role="group">
+              <button type="button" class="t-label" data-step="-1" aria-label={t.store.decrease}>−</button>
+              <bdi lang="en" class="t-label" data-qty></bdi>
+              <button type="button" class="t-label" data-step="1" aria-label={t.store.increase}>+</button>
+            </div>
+          </td>
+          <td class="cart__num"><bdi lang="en" class="cart__money" data-line-total></bdi></td>
+          <td class="cart__num">
+            <button type="button" class="t-label cart__remove" data-remove>[&nbsp;{t.store.remove}&nbsp;]</button>
+          </td>
+        </tr>
+      </template>
+
+      <script type="application/json" data-cart-catalog set:html={JSON.stringify(catalog)} />
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  @layer components {
+    .cart {
+      padding-block: var(--space-lg) var(--space-3xl);
+    }
+
+    .cart__empty {
+      display: grid;
+      justify-items: start;
+      gap: var(--space-lg);
+    }
+
+    .cart__full {
+      display: grid;
+      gap: var(--space-2xl);
+    }
+
+    @media (min-width: 56rem) {
+      .cart__full {
+        grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+        align-items: start;
+      }
+    }
+
+    .cart__table th,
+    .cart__table td {
+      padding: var(--space-sm) var(--space-xs);
+      border-block-end: var(--line-width) solid var(--color-line);
+      vertical-align: middle;
+    }
+
+    .cart__table thead th {
+      color: var(--color-ink-muted);
+      font-weight: var(--weight-label);
+    }
+
+    .cart__num {
+      text-align: end;
+      white-space: nowrap;
+    }
+
+    .cart__item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .cart__thumb {
+      inline-size: var(--space-3xl);
+      block-size: auto;
+      aspect-ratio: var(--ratio-portrait);
+      object-fit: cover;
+      background: var(--color-media);
+      filter: var(--media-filter);
+    }
+
+    .cart__text {
+      display: grid;
+      gap: var(--space-2xs);
+    }
+
+    .cart__money {
+      font-family: var(--font-mono);
+      font-weight: var(--weight-strong);
+    }
+
+    .qty-mini {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-xs);
+    }
+
+    .qty-mini button,
+    .cart__remove {
+      min-inline-size: var(--hit-target);
+      min-block-size: var(--hit-target);
+      color: var(--color-ink);
+    }
+
+    .cart__remove {
+      color: var(--color-ink-muted);
+    }
+
+    .cart__remove:hover {
+      color: var(--color-ink);
+    }
+
+    .cart__summary {
+      display: grid;
+      gap: var(--space-md);
+      padding: var(--cell-pad-lg);
+      border: var(--line-width) solid var(--color-line);
+    }
+
+    .cart__subtotal {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+    }
+  }
+</style>
+
+<script>
+  import { cart } from '../../scripts/cart';
+  import { onPageLoad } from '../../scripts/lifecycle';
+
+  interface Entry {
+    title: string;
+    href: string;
+    image: string;
+    price: number;
+    variants: Record<string, { label: string; price: number }>;
+  }
+
+  onPageLoad(() => {
+    const root = document.querySelector<HTMLElement>('[data-cart]');
+    if (!root) return;
+    const catalog = JSON.parse(root.querySelector('[data-cart-catalog]')?.textContent ?? '{}') as Record<string, Entry>;
+    const tpl = root.querySelector<HTMLTemplateElement>('template[data-cart-row]')!;
+    const rows = root.querySelector<HTMLElement>('[data-cart-rows]')!;
+    const money = new Intl.NumberFormat(root.dataset.priceLocale ?? 'en-US', {
+      style: 'currency',
+      currency: root.dataset.currency ?? 'USD',
+      maximumFractionDigits: 0,
+    });
+
+    const render = () => {
+      const lines = cart.read().filter((l) => catalog[l.product]);
+      root.querySelector<HTMLElement>('[data-cart-empty]')!.hidden = lines.length > 0;
+      root.querySelector<HTMLElement>('[data-cart-full]')!.hidden = lines.length === 0;
+      rows.replaceChildren();
+      let subtotal = 0;
+      lines.forEach((line) => {
+        const entry = catalog[line.product]!;
+        const variant = entry.variants[line.variant];
+        const unit = variant?.price ?? entry.price;
+        subtotal += unit * line.qty;
+        const row = tpl.content.firstElementChild!.cloneNode(true) as HTMLTableRowElement;
+        const link = row.querySelector<HTMLAnchorElement>('[data-href]')!;
+        link.href = entry.href;
+        row.querySelector<HTMLImageElement>('[data-image]')!.src = entry.image;
+        row.querySelector('[data-title]')!.textContent = entry.title;
+        row.querySelector('[data-variant]')!.textContent = variant?.label ?? '';
+        row.querySelector('[data-qty]')!.textContent = String(line.qty).padStart(2, '0');
+        row.querySelector('[data-line-total]')!.textContent = money.format(unit * line.qty);
+        row.querySelectorAll<HTMLButtonElement>('[data-step]').forEach((b) =>
+          b.addEventListener('click', () => cart.setQty(line.product, line.variant, line.qty + Number(b.dataset.step))),
+        );
+        row.querySelector('[data-remove]')!.addEventListener('click', () => cart.remove(line.product, line.variant));
+        rows.append(row);
+      });
+      root.querySelector('[data-cart-subtotal]')!.textContent = money.format(subtotal);
+    };
+
+    document.addEventListener('rz:cart-change', render);
+    document.addEventListener('astro:before-swap', () => document.removeEventListener('rz:cart-change', render), { once: true });
+    render();
+  });
+</script>

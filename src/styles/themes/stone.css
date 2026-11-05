@@ -1,0 +1,47 @@
+/*
+ * Theme: STONE — the page as a cream box floating on a stone ground.
+ * Uppercase sans display, ochre accent. Customisations: boxed frame.
+ */
+@layer tokens.themes {
+  [data-theme='stone'] {
+    --color-ground: light-dark(var(--p-stone-300), var(--p-umber-950));
+    --color-canvas: light-dark(var(--p-cream-50), var(--p-umber-900));
+    --color-surface: light-dark(var(--p-cream-100), var(--p-umber-850));
+    --color-surface-2: light-dark(var(--p-cream-200), var(--p-umber-800));
+    --color-ink: light-dark(var(--p-cream-900), var(--p-cream-100));
+    --color-ink-muted: light-dark(var(--p-cream-600), var(--p-umber-200));
+    --color-ink-subtle: light-dark(var(--p-cream-400), var(--p-umber-500));
+    --color-line: light-dark(var(--p-cream-300), var(--p-umber-700));
+    --color-line-strong: light-dark(var(--p-cream-500), var(--p-umber-400));
+
+    --color-accent: light-dark(var(--p-ochre-500), var(--p-ochre-400));
+    --color-accent-ink: light-dark(
+      color-mix(in srgb, var(--color-accent) 58%, var(--p-cream-900)),
+      color-mix(in srgb, var(--color-accent) 85%, var(--p-cream-100))
+    );
+    --color-on-accent: light-dark(var(--p-cream-900), var(--p-cream-900));
+    --color-accent-2: light-dark(var(--p-olive-500), var(--p-olive-300));
+    --color-accent-3: light-dark(var(--p-sky-500), var(--p-sky-300));
+
+    --color-focus: var(--color-accent-ink);
+    --color-media: light-dark(var(--p-cream-100), var(--p-umber-850));
+    --color-selection: light-dark(var(--p-cream-900), var(--p-cream-100));
+    --color-on-selection: light-dark(var(--p-cream-50), var(--p-umber-900));
+
+    --color-notch-ground: light-dark(var(--p-cream-200), var(--p-umber-850));
+    --color-notch-card: light-dark(var(--p-cream-50), var(--p-umber-700));
+    --color-notch-ink: light-dark(var(--p-cream-900), var(--p-cream-100));
+    --color-notch-label: light-dark(var(--p-cream-600), var(--p-umber-200));
+    --color-notch-line: light-dark(var(--p-cream-300), var(--p-umber-400));
+
+    /* customisations */
+    --frame-inset: var(--p-space-fluid-12-80);
+    --frame-border-block: var(--line-width);
+    --font-display-latin: var(--p-font-inter), var(--p-font-system-sans);
+    --weight-display-latin: var(--p-weight-400);
+    --tracking-display-latin: var(--p-tracking-0);
+    --leading-display-latin: var(--p-leading-1-05);
+    --leading-heading-latin: var(--p-leading-1-15);
+    --display-transform: uppercase;
+  }
+}

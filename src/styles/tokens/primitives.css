@@ -63,6 +63,111 @@
     --p-olive-glass-200: #a9a98d;
 
     /* ---------------------------------------------------------------- *
+     * Colour — stone / cream (boxed page on a stone ground)
+     * ---------------------------------------------------------------- */
+    --p-cream-50: #f7f4eb;
+    --p-cream-100: #efebe0;
+    --p-cream-200: #e6e1d4;
+    --p-cream-300: #cbc6b8;
+    --p-cream-400: #a9a598;
+    --p-cream-500: #8c887c;
+    --p-cream-600: #64615a;
+    --p-cream-900: #1b1a17;
+    --p-stone-300: #cfcbc1;
+    --p-ochre-400: #d2ae5e;
+    --p-ochre-500: #c29a45;
+    --p-umber-950: #10100e;
+    --p-umber-900: #1c1b18;
+    --p-umber-850: #24231f;
+    --p-umber-800: #2b2a25;
+    --p-umber-700: #3a3833;
+    --p-umber-500: #5a5850;
+    --p-umber-400: #6e6b62;
+    --p-umber-200: #a7a397;
+
+    /* ---------------------------------------------------------------- *
+     * Colour — sand (warm greige, dark hairlines, boxed cells)
+     * ---------------------------------------------------------------- */
+    --p-sand-50: #f5f1eb;
+    --p-sand-100: #ede8e1;
+    --p-sand-200: #e4ded5;
+    --p-sand-400: #9e978d;
+    --p-sand-600: #5c5853;
+    --p-sand-800: #2a2826;
+    --p-sand-950: #161514;
+    --p-cocoa-400: #c99c7c;
+    --p-cocoa-500: #b98a6a;
+    --p-dune-950: #171614;
+    --p-dune-900: #1f1e1b;
+    --p-dune-850: #26241f;
+    --p-dune-600: #5e5952;
+    --p-dune-500: #5f5a53;
+    --p-dune-200: #a9a39a;
+
+    /* ---------------------------------------------------------------- *
+     * Colour — paper (cool off-white, deep teal ink, pastel media)
+     * ---------------------------------------------------------------- */
+    --p-paper-50: #fbfaf6;
+    --p-paper-100: #f3f1ea;
+    --p-paper-200: #e9e6dc;
+    --p-teal-300: #97a6aa;
+    --p-teal-600: #4d6169;
+    --p-teal-800: #2e4a54;
+    --p-teal-900: #1d3a44;
+    --p-teal-950: #0f2027;
+    --p-coral-400: #e98670;
+    --p-coral-500: #e0684f;
+    --p-sun-400: #f2c14e;
+    --p-pool-400: #7fb7c9;
+    --p-deep-950: #121a1d;
+    --p-deep-900: #182327;
+    --p-deep-850: #1e2c31;
+    --p-deep-700: #3b5259;
+    --p-deep-500: #4a5d63;
+    --p-deep-200: #9db2b8;
+    --p-deep-50: #e6eeec;
+
+    /* ---------------------------------------------------------------- *
+     * Colour — studio (monochrome greige, photography in grey)
+     * ---------------------------------------------------------------- */
+    --p-greige-100: #e8e5de;
+    --p-greige-200: #dfdcd4;
+    --p-greige-300: #d5d1c8;
+    --p-greige-350: #cfcbc2;
+    --p-greige-500: #8f8b82;
+    --p-greige-550: #8e8a81;
+    --p-greige-700: #55524c;
+    --p-greige-900: #222120;
+    --p-char-950: #1a1918;
+    --p-char-900: #222120;
+    --p-char-850: #2a2927;
+    --p-char-700: #4b4844;
+    --p-char-500: #66625b;
+    --p-char-200: #a8a49b;
+    --p-char-50: #e5e2da;
+
+    /* ---------------------------------------------------------------- *
+     * Colour — sage (green ground, black ink, all-mono)
+     * ---------------------------------------------------------------- */
+    --p-sage-200: #b4bea9;
+    --p-sage-300: #a8b39d;
+    --p-sage-350: #9fa994;
+    --p-sage-400: #9ca791;
+    --p-sage-600: #5b6352;
+    --p-sage-800: #2e3428;
+    --p-sage-950: #0e0f0c;
+    --p-leaf-300: #9dbb7a;
+    --p-leaf-700: #3f5a2a;
+    --p-leaf-50: #e9eee2;
+    --p-moss-950: #151912;
+    --p-moss-900: #1c2118;
+    --p-moss-850: #232a1f;
+    --p-moss-600: #4e5847;
+    --p-moss-500: #5d6853;
+    --p-moss-200: #a3ae98;
+    --p-moss-50: #d5ddc8;
+
+    /* ---------------------------------------------------------------- *
      * Type families (placeholders — see README "Change fonts")
      * ---------------------------------------------------------------- */
     --p-font-instrument: 'Instrument Serif';
@@ -92,7 +197,9 @@
     --p-size-wordmark: 24cqi; /* relative to the footer container */
 
     --p-leading-0-95: 0.95;
+    --p-leading-1-05: 1.05;
     --p-leading-1-1: 1.1;
+    --p-leading-1-15: 1.15;
     --p-leading-1-25: 1.25;
     --p-leading-1-4: 1.4;
     --p-leading-1-55: 1.55;
@@ -106,6 +213,10 @@
     --p-tracking-0: 0;
     --p-tracking-tight: -0.02em;
     --p-tracking-label: 0.08em;
+    --p-tracking-label-tight: 0.04em;
+    --p-tracking-label-wide: 0.12em;
+    --p-tracking-wide: 0.03em;
+    --p-tracking-0-01: 0.01em;
 
     /* ---------------------------------------------------------------- *
      * Space (4px base)
@@ -124,6 +235,7 @@
     --p-space-128: 8rem;
     --p-space-fluid-16-40: clamp(1rem, 0.6rem + 1.8vw, 2.5rem);
     --p-space-fluid-64-160: clamp(4rem, 2rem + 8vw, 10rem);
+    --p-space-fluid-12-80: clamp(0.75rem, 0.2rem + 4vw, 5rem);
 
     /* ---------------------------------------------------------------- *
      * Lines, radius, sizes

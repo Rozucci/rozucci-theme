@@ -204,6 +204,12 @@ const hasMediaSlot = Astro.slots.has('media');
       inline-size: 100%;
       block-size: 100%;
       object-fit: cover;
+      filter: var(--media-filter);
+      transition: filter var(--dur-base) var(--ease-standard);
+    }
+
+    .notch__card:hover .notch__media :global(img) {
+      filter: var(--media-filter-hover);
     }
 
     .notch__body {

@@ -1,0 +1,82 @@
+---
+/**
+ * FilterBar — text-only tabs that filter a CellGrid (work index, shop).
+ * Active item: ink + underline. Counts stay Latin. Only shown with JS
+ * (without it, every item is listed). Wired by src/scripts/filter.ts:
+ *   bar  [data-filter-bar data-param="d"]
+ *   grid [data-filter-grid] → items [data-filter-item data-filter-key="…"]
+ */
+import { code, num } from '../i18n/utils';
+import type { LocaleCode } from '../site.config';
+
+interface Props {
+  label: string;
+  /** Query-string key that preselects a filter (?d=web). */
+  param: string;
+  items: { key: string; name: string; n: number }[];
+  countLabel: string;
+  locale: LocaleCode;
+}
+
+const { label, param, items, countLabel, locale } = Astro.props;
+const total = items[0]?.n ?? 0;
+---
+
+<div class="filter-bar pad u-js-only" role="group" aria-label={label} data-filter-bar data-param={param}>
+  {
+    items.map((f, i) => (
+      <button type="button" class="filter-bar__item t-label" data-filter={f.key} aria-pressed={i === 0 ? 'true' : 'false'}>
+        <span class="filter-bar__name">{f.name}</span>&nbsp;<bdi lang="en" class="filter-bar__n">({code(f.n)})</bdi>
+      </button>
+    ))
+  }
+</div>
+<p class="visually-hidden" aria-live="polite" data-filter-status data-label={countLabel} data-lang={locale}>
+  {num(total, locale)} {countLabel}
+</p>
+
+<style>
+  @layer components {
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-xs) var(--space-lg);
+      padding-block: var(--space-md);
+      border-block: var(--line-width) solid var(--color-line);
+    }
+
+    .filter-bar__item {
+      display: inline-flex;
+      align-items: center;
+      min-block-size: var(--hit-target);
+      color: var(--color-ink-muted);
+      transition: color var(--dur-hover) var(--ease-standard);
+    }
+
+    .filter-bar__name {
+      text-decoration-line: underline;
+      text-decoration-thickness: var(--line-width);
+      text-underline-offset: 0.45em;
+      text-decoration-color: transparent;
+      transition: text-decoration-color var(--dur-fast) var(--ease-standard);
+    }
+
+    .filter-bar__item:hover,
+    .filter-bar__item[aria-pressed='true'] {
+      color: var(--color-ink);
+    }
+
+    .filter-bar__item[aria-pressed='true'] .filter-bar__name {
+      text-decoration-color: currentColor;
+    }
+
+    .filter-bar__n {
+      color: var(--color-ink-muted);
+    }
+
+    /* Filtered-out cells: a class (not [hidden]) so Flip can animate them. */
+    :global([data-filter-item].is-out) {
+      display: none;
+    }
+  }
+</style>

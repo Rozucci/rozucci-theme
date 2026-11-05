@@ -6,16 +6,23 @@
 @layer layout {
   .container {
     inline-size: 100%;
-    max-inline-size: var(--container);
+    max-inline-size: min(var(--container), 100% - 2 * var(--frame-inset));
     margin-inline: auto;
   }
 
-  /* The framed page column: vertical hairlines on both inline edges. */
+  /*
+   * The framed page column: hairlines on both inline edges. Boxed themes set
+   * --frame-inset / --frame-border-block and the page floats as a box on
+   * --color-ground.
+   */
   .frame {
     border-inline: var(--line-width) solid var(--color-line);
-    min-block-size: 100svh;
+    border-block: var(--frame-border-block) solid var(--color-line);
+    margin-block: var(--frame-inset);
+    min-block-size: calc(100svh - 2 * var(--frame-inset));
     display: flex;
     flex-direction: column;
+    background: var(--color-canvas);
   }
 
   .frame > main {

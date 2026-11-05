@@ -1,0 +1,74 @@
+---
+/**
+ * Accordion — native <details>/<summary> (works without JS) on hairlines,
+ * with a text sign: + closed, − open.
+ */
+interface Props {
+  title: string;
+  open?: boolean;
+  class?: string;
+}
+
+const { title, open = false, class: className } = Astro.props;
+---
+
+<details class:list={['acc', className]} open={open}>
+  <summary class="acc__summary">
+    <span class="t-label acc__title">{title}</span>
+    <span class="acc__sign" lang="en" aria-hidden="true"></span>
+  </summary>
+  <div class="acc__body">
+    <slot />
+  </div>
+</details>
+
+<style>
+  @layer components {
+    .acc {
+      border-block-end: var(--line-width) solid var(--color-line);
+    }
+
+    .acc__summary {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: var(--space-md);
+      min-block-size: var(--hit-target);
+      padding-block: var(--space-sm);
+      cursor: pointer;
+      list-style: none;
+    }
+
+    .acc__summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .acc__title {
+      color: var(--color-ink);
+    }
+
+    .acc__sign {
+      font-family: var(--font-mono);
+    }
+
+    .acc__sign::before {
+      content: '+';
+    }
+
+    .acc[open] .acc__sign::before {
+      content: '−';
+    }
+
+    .acc__body {
+      padding-block-end: var(--space-md);
+      color: var(--color-ink-muted);
+      font-size: var(--text-sm);
+      line-height: var(--leading-snug);
+    }
+
+    .acc__body :global(ul) {
+      margin: 0;
+      padding-inline-start: var(--space-md);
+    }
+  }
+</style>

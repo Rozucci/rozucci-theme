@@ -17,6 +17,11 @@
 @import './tokens/semantic.css';
 @import './themes/ivory.css';
 @import './themes/bone.css';
+@import './themes/stone.css';
+@import './themes/sand.css';
+@import './themes/paper.css';
+@import './themes/studio.css';
+@import './themes/sage.css';
 @import './base.css';
 @import './layout.css';
 @import './motion.css';

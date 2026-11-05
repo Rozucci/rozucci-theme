@@ -67,10 +67,16 @@ const isList = Tag === 'ul' || Tag === 'ol';
 
 <style>
   @layer components {
+    /*
+     * Two looks from the same markup, chosen by theme tokens:
+     *   collapsed (default): --cell-gap 0, hairlines via pseudo-elements
+     *   boxed:               --cell-gap > 0, every cell bordered, no rules
+     */
     .cell-grid {
       --cg-draw: 1;
       container-type: inline-size;
       overflow: clip;
+      padding: var(--cell-grid-pad);
     }
 
     .cell-grid--frame {
@@ -83,8 +89,9 @@ const isList = Tag === 'ul' || Tag === 'ol';
         auto-fill,
         minmax(min(var(--cg-min, var(--cell-min)), 100%), 1fr)
       );
-      margin-inline-end: calc(-1 * var(--line-width));
-      margin-block-end: calc(-1 * var(--line-width));
+      gap: var(--cell-gap);
+      margin-inline-end: calc(-1 * var(--cell-rule));
+      margin-block-end: calc(-1 * var(--cell-rule));
       padding: 0;
       list-style: none;
     }
@@ -108,6 +115,7 @@ const isList = Tag === 'ul' || Tag === 'ol';
     .cell-grid__cells > :global(*) {
       position: relative;
       min-inline-size: 0;
+      border: var(--cell-border) solid var(--color-line);
     }
 
     /* block-end hairline */
@@ -116,7 +124,7 @@ const isList = Tag === 'ul' || Tag === 'ol';
       position: absolute;
       inset-inline: 0;
       inset-block-end: 0;
-      block-size: var(--line-width);
+      block-size: var(--cell-rule);
       background: var(--color-line);
       transform: scaleX(var(--cg-draw));
       transform-origin: var(--origin-inline-start);
@@ -129,7 +137,7 @@ const isList = Tag === 'ul' || Tag === 'ol';
       position: absolute;
       inset-block: 0;
       inset-inline-end: 0;
-      inline-size: var(--line-width);
+      inline-size: var(--cell-rule);
       background: var(--color-line);
       transform: scaleY(var(--cg-draw));
       transform-origin: top;

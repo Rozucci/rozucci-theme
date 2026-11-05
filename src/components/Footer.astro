@@ -6,6 +6,7 @@
 import CellGrid from './CellGrid.astro';
 import Label from './Label.astro';
 import TextLink from './TextLink.astro';
+import ThemeSwitcher from './ThemeSwitcher.astro';
 import type { LocaleCode } from '../site.config';
 import { site } from '../site.config';
 import { localizePath, useTranslations, year } from '../i18n/utils';
@@ -57,6 +58,7 @@ const buildYear = new Date().getFullYear();
     <div class="site-footer__cell site-footer__colophon">
       <p class="t-label u-muted">© {year(buildYear, locale)} <bdi lang="en">{site.name}</bdi>. {t.footer.rights}</p>
       <p class="t-label u-muted">{t.footer.colophon}</p>
+      <ThemeSwitcher locale={locale} />
       <TextLink href="#main" arrow="up" variant="label" class="site-footer__top">{t.actions.backToTop}</TextLink>
     </div>
   </CellGrid>

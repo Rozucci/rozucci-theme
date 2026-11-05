@@ -1,0 +1,50 @@
+/*
+ * Theme: STUDIO — monochrome greige. Light uppercase sans display, outline
+ * buttons, photography in grey that regains colour on hover.
+ * The "accent" is the ink itself: a strictly one-colour view.
+ */
+@layer tokens.themes {
+  [data-theme='studio'] {
+    --color-ground: light-dark(var(--p-greige-200), var(--p-char-950));
+    --color-canvas: light-dark(var(--p-greige-200), var(--p-char-950));
+    --color-surface: light-dark(var(--p-greige-100), var(--p-char-900));
+    --color-surface-2: light-dark(var(--p-greige-300), var(--p-char-850));
+    --color-ink: light-dark(var(--p-greige-900), var(--p-char-50));
+    --color-ink-muted: light-dark(var(--p-greige-700), var(--p-char-200));
+    --color-ink-subtle: light-dark(var(--p-greige-550), var(--p-char-500));
+    --color-line: light-dark(var(--p-greige-500), var(--p-char-700));
+    --color-line-strong: light-dark(var(--p-greige-900), var(--p-char-200));
+
+    --color-accent: light-dark(var(--p-greige-900), var(--p-char-50));
+    --color-accent-ink: light-dark(var(--p-greige-900), var(--p-char-50));
+    --color-on-accent: light-dark(var(--p-greige-200), var(--p-char-950));
+    --color-accent-2: light-dark(var(--p-greige-700), var(--p-char-200));
+    --color-accent-3: light-dark(var(--p-greige-500), var(--p-char-500));
+
+    --color-focus: var(--color-ink);
+    --color-media: light-dark(var(--p-greige-350), var(--p-char-900));
+    --color-selection: light-dark(var(--p-greige-900), var(--p-char-50));
+    --color-on-selection: light-dark(var(--p-greige-200), var(--p-char-950));
+
+    --color-notch-ground: light-dark(var(--p-greige-300), var(--p-char-900));
+    --color-notch-card: light-dark(var(--p-greige-100), var(--p-char-850));
+    --color-notch-ink: light-dark(var(--p-greige-900), var(--p-char-50));
+    --color-notch-label: light-dark(var(--p-greige-700), var(--p-char-200));
+    --color-notch-line: light-dark(var(--p-greige-500), var(--p-char-700));
+
+    /* customisations */
+    --font-display-latin: var(--p-font-inter), var(--p-font-system-sans);
+    --weight-display-latin: var(--p-weight-300);
+    --tracking-display-latin: var(--p-tracking-wide);
+    --leading-display-latin: var(--p-leading-1-05);
+    --leading-heading-latin: var(--p-leading-1-15);
+    --display-transform: uppercase;
+    --media-filter: grayscale(1);
+    --media-filter-hover: grayscale(0);
+    --button-bg: transparent;
+    --button-ink: var(--color-ink);
+    --button-border: var(--color-ink);
+    --button-hover-bg: var(--color-ink);
+    --button-hover-ink: var(--color-canvas);
+  }
+}

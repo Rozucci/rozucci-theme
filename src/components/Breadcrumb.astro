@@ -1,0 +1,59 @@
+---
+/**
+ * Breadcrumb — text path with "/" separators (direction-neutral, mirrors fine).
+ */
+interface Props {
+  label: string;
+  items: { label: string; href?: string }[];
+}
+
+const { label, items } = Astro.props;
+---
+
+<nav class="crumbs t-label" aria-label={label}>
+  <ol role="list">
+    {
+      items.map((item, i) => (
+        <li>
+          {item.href && i < items.length - 1 ? (
+            <a href={item.href}>{item.label}</a>
+          ) : (
+            <span aria-current="page">{item.label}</span>
+          )}
+        </li>
+      ))
+    }
+  </ol>
+</nav>
+
+<style>
+  @layer components {
+    .crumbs ol {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-xs);
+      margin: 0;
+      padding: 0;
+    }
+
+    .crumbs li {
+      display: inline-flex;
+      gap: var(--space-xs);
+      color: var(--color-ink-muted);
+    }
+
+    .crumbs li + li::before {
+      content: '/';
+      color: var(--color-ink-subtle);
+    }
+
+    .crumbs a {
+      color: var(--color-ink);
+      text-underline-offset: 0.3em;
+    }
+
+    .crumbs [aria-current] {
+      color: var(--color-ink-muted);
+    }
+  }
+</style>

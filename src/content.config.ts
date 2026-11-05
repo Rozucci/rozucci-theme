@@ -10,6 +10,7 @@ import { defineCollection } from 'astro:content';
 import { glob } from 'astro/loaders';
 import { z } from 'astro/zod';
 import { DISCIPLINES } from './data/disciplines';
+import { CATEGORIES } from './data/store';
 
 const projects = defineCollection({
   loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/projects' }),
@@ -43,4 +44,29 @@ const projects = defineCollection({
     }),
 });
 
-export const collections = { projects };
+/**
+ * Products (store demo): src/content/products/<locale>/<slug>.md, paired
+ * across locales by file name like projects. Prices are numbers in the
+ * currency from site.config → store.currency.
+ */
+const products = defineCollection({
+  loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/products' }),
+  schema: ({ image }) =>
+    z.object({
+      title: z.string(),
+      summary: z.string(),
+      category: z.enum(CATEGORIES),
+      price: z.number(),
+      variants: z
+        .array(z.object({ id: z.string(), label: z.string(), price: z.number().optional() }))
+        .default([]),
+      images: z.array(z.object({ src: image(), alt: z.string() })).min(1),
+      details: z.array(z.string()).default([]),
+      digital: z.boolean().default(false),
+      order: z.number().int(),
+      featured: z.boolean().default(false),
+      draft: z.boolean().default(false),
+    }),
+});
+
+export const collections = { projects, products };

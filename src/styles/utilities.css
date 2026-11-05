@@ -9,6 +9,7 @@
     font-weight: var(--weight-display);
     line-height: var(--leading-display);
     letter-spacing: var(--tracking-display);
+    text-transform: var(--display-transform);
   }
 
   .t-3xl {
@@ -17,6 +18,7 @@
     font-weight: var(--weight-display);
     line-height: var(--leading-display);
     letter-spacing: var(--tracking-display);
+    text-transform: var(--display-transform);
   }
 
   .t-2xl {
@@ -25,6 +27,7 @@
     font-weight: var(--weight-display);
     line-height: var(--leading-heading);
     letter-spacing: var(--tracking-display);
+    text-transform: var(--display-transform);
   }
 
   .t-xl {
@@ -32,6 +35,8 @@
     font-size: var(--text-xl);
     font-weight: var(--weight-display);
     line-height: var(--leading-heading);
+    letter-spacing: var(--tracking-display);
+    text-transform: var(--display-transform);
   }
 
   .t-lg {
@@ -61,7 +66,7 @@
     font-weight: var(--weight-label);
     line-height: var(--leading-label);
     letter-spacing: var(--label-tracking);
-    text-transform: uppercase;
+    text-transform: var(--label-transform);
   }
 
   /*

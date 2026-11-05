@@ -106,6 +106,12 @@ const usableWidths = src ? widths.filter((w) => w <= src.width) : widths;
 
     .media__inner :global(img) {
       object-fit: cover;
+      filter: var(--media-filter);
+      transition: filter var(--dur-base) var(--ease-standard);
+    }
+
+    :global(a:hover) .media__inner :global(img) {
+      filter: var(--media-filter-hover);
     }
 
     .media__caption {

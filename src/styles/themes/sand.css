@@ -1,0 +1,46 @@
+/*
+ * Theme: SAND — warm greige, near-black hairlines, separate boxed cells.
+ * Uppercase serif display, cocoa accent. Customisations: boxed grid.
+ */
+@layer tokens.themes {
+  [data-theme='sand'] {
+    --color-ground: light-dark(var(--p-sand-100), var(--p-dune-950));
+    --color-canvas: light-dark(var(--p-sand-100), var(--p-dune-950));
+    --color-surface: light-dark(var(--p-sand-50), var(--p-dune-900));
+    --color-surface-2: light-dark(var(--p-sand-200), var(--p-dune-850));
+    --color-ink: light-dark(var(--p-sand-950), var(--p-sand-100));
+    --color-ink-muted: light-dark(var(--p-sand-600), var(--p-dune-200));
+    --color-ink-subtle: light-dark(var(--p-sand-400), var(--p-dune-500));
+    --color-line: light-dark(var(--p-sand-800), var(--p-dune-600));
+    --color-line-strong: light-dark(var(--p-sand-950), var(--p-sand-100));
+
+    --color-accent: light-dark(var(--p-cocoa-500), var(--p-cocoa-400));
+    --color-accent-ink: light-dark(
+      color-mix(in srgb, var(--color-accent) 55%, var(--p-sand-950)),
+      color-mix(in srgb, var(--color-accent) 85%, var(--p-sand-100))
+    );
+    --color-on-accent: light-dark(var(--p-sand-950), var(--p-sand-950));
+    --color-accent-2: light-dark(var(--p-olive-500), var(--p-olive-300));
+    --color-accent-3: light-dark(var(--p-sky-500), var(--p-sky-300));
+
+    --color-focus: var(--color-accent-ink);
+    --color-media: light-dark(var(--p-sand-50), var(--p-dune-900));
+    --color-selection: light-dark(var(--p-sand-950), var(--p-sand-100));
+    --color-on-selection: light-dark(var(--p-sand-100), var(--p-dune-950));
+
+    --color-notch-ground: light-dark(var(--p-sand-200), var(--p-dune-900));
+    --color-notch-card: light-dark(var(--p-sand-50), var(--p-dune-850));
+    --color-notch-ink: light-dark(var(--p-sand-950), var(--p-sand-100));
+    --color-notch-label: light-dark(var(--p-sand-600), var(--p-dune-200));
+    --color-notch-line: light-dark(var(--p-sand-800), var(--p-dune-600));
+
+    /* customisations */
+    --cell-gap: var(--space-md);
+    --cell-border: var(--line-width);
+    --cell-rule: 0px;
+    --cell-grid-pad: var(--gutter);
+    --tracking-display-latin: var(--p-tracking-0-01);
+    --leading-display-latin: var(--p-leading-1-05);
+    --display-transform: uppercase;
+  }
+}

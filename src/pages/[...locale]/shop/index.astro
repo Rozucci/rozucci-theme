@@ -1,0 +1,84 @@
+---
+/**
+ * Shop — the catalog (store demo). Text filter tabs, product CellGrid,
+ * quick add-to-cart. Built from the products content collection.
+ */
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import CellGrid from '../../../components/CellGrid.astro';
+import SectionHead from '../../../components/SectionHead.astro';
+import FilterBar from '../../../components/FilterBar.astro';
+import ProductCard from '../../../components/ProductCard.astro';
+import Label from '../../../components/Label.astro';
+import Price from '../../../components/Price.astro';
+import type { LocaleCode } from '../../../site.config';
+import { site } from '../../../site.config';
+import { localeStaticPaths, useTranslations } from '../../../i18n/utils';
+import { CATEGORIES } from '../../../data/store';
+import { fromPrice, getProducts, productHref, productSlug } from '../../../lib/products';
+
+export function getStaticPaths() {
+  return localeStaticPaths();
+}
+
+interface Props {
+  locale: LocaleCode;
+}
+
+const { locale } = Astro.props;
+const t = useTranslations(locale);
+const products = await getProducts(locale);
+const count = (c?: string) => (c ? products.filter((p) => p.data.category === c).length : products.length);
+const filters = [{ key: 'all', name: t.actions.all, n: count() }].concat(
+  CATEGORIES.filter((c) => count(c) > 0).map((c) => ({ key: c, name: t.store.categories[c], n: count(c) })),
+);
+---
+
+<BaseLayout locale={locale} title={t.store.title} description={t.store.intro}>
+  <section class="section section--flush" aria-labelledby="shop-title">
+    <SectionHead index={1} id="shop-title" level="h1" size="2xl" title={t.store.title} lead={t.store.intro} />
+    <FilterBar label={t.store.filterLabel} param="c" items={filters} countLabel={t.store.count} locale={locale} />
+    <CellGrid cols={3} as="ul" data-filter-grid>
+      {
+        products.map((p, i) => (
+          <ProductCard
+            slug={productSlug(p)}
+            href={productHref(p)}
+            title={p.data.title}
+            category={p.data.category}
+            price={fromPrice(p)}
+            fromPrice={p.data.variants.length > 1}
+            variant={p.data.variants[0]?.id ?? ''}
+            digital={p.data.digital}
+            image={p.data.images[0]!.src}
+            alt={p.data.images[0]!.alt}
+            locale={locale}
+            priority={i < 3}
+          />
+        ))
+      }
+    </CellGrid>
+    <div class="shop-note pad">
+      <Label>{t.store.freeShipping}{' '}<Price value={site.store.freeShippingFrom} locale={locale} /></Label>
+      <Label>{t.store.shipsIn.replace('{days}', site.store.shipsInDays)}</Label>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  @layer components {
+    .shop-note {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: var(--space-sm);
+      padding-block: var(--space-md);
+      border-block-start: var(--line-width) solid var(--color-line);
+    }
+  }
+</style>
+
+<script>
+  import { initFilter } from '../../../scripts/filter';
+  import { onPageLoad } from '../../../scripts/lifecycle';
+  onPageLoad(initFilter);
+</script>

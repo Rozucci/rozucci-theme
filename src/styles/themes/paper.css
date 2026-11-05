@@ -1,0 +1,44 @@
+/*
+ * Theme: PAPER — cool off-white, deep teal ink and hairlines, coral accent.
+ * Serif display with italic emphasis; media carries pastel colour.
+ */
+@layer tokens.themes {
+  [data-theme='paper'] {
+    --color-ground: light-dark(var(--p-paper-100), var(--p-deep-950));
+    --color-canvas: light-dark(var(--p-paper-100), var(--p-deep-950));
+    --color-surface: light-dark(var(--p-paper-50), var(--p-deep-900));
+    --color-surface-2: light-dark(var(--p-paper-200), var(--p-deep-850));
+    --color-ink: light-dark(var(--p-teal-900), var(--p-deep-50));
+    --color-ink-muted: light-dark(var(--p-teal-600), var(--p-deep-200));
+    --color-ink-subtle: light-dark(var(--p-teal-300), var(--p-deep-500));
+    --color-line: light-dark(var(--p-teal-800), var(--p-deep-700));
+    --color-line-strong: light-dark(var(--p-teal-900), var(--p-deep-200));
+
+    --color-accent: light-dark(var(--p-coral-500), var(--p-coral-400));
+    --color-accent-ink: light-dark(
+      color-mix(in srgb, var(--color-accent) 60%, var(--p-teal-950)),
+      color-mix(in srgb, var(--color-accent) 85%, var(--p-deep-50))
+    );
+    --color-on-accent: light-dark(var(--p-teal-950), var(--p-teal-950));
+    --color-accent-2: light-dark(var(--p-sun-400), var(--p-sun-400));
+    --color-accent-3: light-dark(var(--p-pool-400), var(--p-pool-400));
+
+    --color-focus: var(--color-accent-ink);
+    --color-media: light-dark(var(--p-paper-200), var(--p-deep-900));
+    --color-selection: light-dark(var(--p-teal-900), var(--p-deep-50));
+    --color-on-selection: light-dark(var(--p-paper-100), var(--p-deep-950));
+
+    --color-notch-ground: light-dark(var(--p-paper-200), var(--p-deep-900));
+    --color-notch-card: light-dark(var(--p-paper-50), var(--p-deep-850));
+    --color-notch-ink: light-dark(var(--p-teal-900), var(--p-deep-50));
+    --color-notch-label: light-dark(var(--p-teal-600), var(--p-deep-200));
+    --color-notch-line: light-dark(var(--p-teal-800), var(--p-deep-700));
+
+    /* customisations */
+    --tracking-display-latin: var(--p-tracking-0);
+    --leading-display-latin: var(--p-leading-1-05);
+    --label-tracking-latin: var(--p-tracking-label-wide);
+    --em-style: italic;
+    --em-color: var(--color-accent-ink);
+  }
+}

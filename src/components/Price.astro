@@ -1,0 +1,50 @@
+---
+/**
+ * Price — always Latin digits and mono (prices are codes), in both locales.
+ * `from` prefixes the localised word ("from $45" / «از $45»).
+ */
+import type { LocaleCode } from '../site.config';
+import { useTranslations } from '../i18n/utils';
+import { formatPrice } from '../lib/price';
+
+interface Props {
+  value: number;
+  locale: LocaleCode;
+  from?: boolean;
+  size?: 'sm' | 'md';
+  class?: string;
+  [key: string]: unknown;
+}
+
+const { value, locale, from = false, size = 'sm', class: className, ...rest } = Astro.props;
+const t = useTranslations(locale);
+---
+
+<span class:list={['price', `price--${size}`, className]}>
+  {from && <span class="price__from t-label u-muted">{t.store.from}</span>}
+  <bdi lang="en" class="price__value" {...rest}>{formatPrice(value)}</bdi>
+</span>
+
+<style>
+  @layer components {
+    .price {
+      display: inline-flex;
+      align-items: baseline;
+      gap: var(--space-xs);
+    }
+
+    .price__value {
+      font-family: var(--font-mono);
+      font-weight: var(--weight-strong);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .price--sm .price__value {
+      font-size: var(--text-sm);
+    }
+
+    .price--md .price__value {
+      font-size: var(--text-md);
+    }
+  }
+</style>

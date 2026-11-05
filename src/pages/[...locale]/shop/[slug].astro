@@ -1,0 +1,253 @@
+---
+/**
+ * Product page (store demo): breadcrumb, gallery | info stack (title + price,
+ * story, options, quantity + add to cart, shipping row, accordions), then
+ * related products.
+ */
+import { render } from 'astro:content';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import CellGrid from '../../../components/CellGrid.astro';
+import SectionHead from '../../../components/SectionHead.astro';
+import Breadcrumb from '../../../components/Breadcrumb.astro';
+import Gallery from '../../../components/Gallery.astro';
+import VariantPicker from '../../../components/VariantPicker.astro';
+import Quantity from '../../../components/Quantity.astro';
+import Button from '../../../components/Button.astro';
+import Accordion from '../../../components/Accordion.astro';
+import ProductCard from '../../../components/ProductCard.astro';
+import Label from '../../../components/Label.astro';
+import Price from '../../../components/Price.astro';
+import type { LocaleCode } from '../../../site.config';
+import { site } from '../../../site.config';
+import { locales, localeParam, localizePath, useTranslations } from '../../../i18n/utils';
+import { formatPrice } from '../../../lib/price';
+import {
+  fromPrice,
+  getProducts,
+  localesForProduct,
+  productHref,
+  productSlug,
+  type Product,
+} from '../../../lib/products';
+
+export async function getStaticPaths() {
+  const paths = [];
+  for (const l of locales) {
+    const products = await getProducts(l.code);
+    for (const product of products) {
+      const slug = productSlug(product);
+      const related = products.filter((p) => p !== product).slice(0, 3);
+      paths.push({
+        params: { locale: localeParam(l.code), slug },
+        props: { locale: l.code, product, related, alternateLocales: await localesForProduct(slug) },
+      });
+    }
+  }
+  return paths;
+}
+
+interface Props {
+  locale: LocaleCode;
+  product: Product;
+  related: Product[];
+  alternateLocales: LocaleCode[];
+}
+
+const { locale, product, related, alternateLocales } = Astro.props;
+const t = useTranslations(locale);
+const p = product.data;
+const slug = productSlug(product);
+const { Content } = await render(product);
+const startPrice = p.variants[0]?.price ?? p.price;
+---
+
+<BaseLayout locale={locale} title={p.title} description={p.summary} alternateLocales={alternateLocales}>
+  <div class="section section--flush pad product-crumbs">
+    <Breadcrumb
+      label={t.store.breadcrumb}
+      items={[
+        { label: t.store.title, href: localizePath('/shop/', locale) },
+        { label: t.store.categories[p.category], href: localizePath(`/shop/?c=${p.category}`, locale) },
+        { label: p.title },
+      ]}
+    />
+  </div>
+
+  <section class="section product" aria-labelledby="product-title">
+    <div class="product__media">
+      <Gallery images={p.images} label={t.store.gallery} prev={t.store.prevImage} next={t.store.nextImage} />
+    </div>
+
+    <div class="product__info">
+      <div class="product__block product__head">
+        <h1 id="product-title" class="t-xl product__title" data-reveal="lines">{p.title}</h1>
+        <bdi lang="en" class="product__price" data-product-price>{formatPrice(startPrice)}</bdi>
+      </div>
+
+      <div class="product__block product__story">
+        <p class="t-md">{p.summary}</p>
+        <div class="u-muted"><Content /></div>
+      </div>
+
+      <form
+        class="product__block product__form"
+        data-product-form
+        data-product={slug}
+        data-price-locale={site.store.priceLocale}
+        data-currency={site.store.currency}
+      >
+        {p.variants.length > 0 && <VariantPicker legend={t.store.option} options={p.variants} basePrice={p.price} />}
+        <div class="product__buy">
+          <Quantity label={t.store.quantity} decrease={t.store.decrease} increase={t.store.increase} />
+          <Button type="submit" sign="[+]" class="product__add" data-add-to-cart data-label-added={t.store.added}>
+            <span data-add-label>{t.store.addToCart}</span>
+          </Button>
+        </div>
+        <Button href={localizePath('/cart/', locale)} variant="secondary" full arrow>{t.store.cart}</Button>
+      </form>
+
+      <div class="product__block product__ship">
+        <Label>
+          {p.digital ? t.store.digital : <>{t.store.freeShipping}{' '}<Price value={site.store.freeShippingFrom} locale={locale} /></>}
+        </Label>
+        {!p.digital && <Label>{t.store.shipsIn.replace('{days}', site.store.shipsInDays)}</Label>}
+      </div>
+
+      <div class="product__block product__acc">
+        <Accordion title={t.store.details} open>
+          <ul>{p.details.map((d) => <li>{d}</li>)}</ul>
+        </Accordion>
+        <Accordion title={t.store.shipping}>
+          <p>{t.store.shippingText}</p>
+        </Accordion>
+        {p.digital && (
+          <Accordion title={t.store.licence}>
+            <p>{t.store.licenceText}</p>
+          </Accordion>
+        )}
+      </div>
+    </div>
+  </section>
+
+  {
+    related.length > 0 && (
+      <section class="section" aria-labelledby="related-title">
+        <SectionHead index={2} id="related-title" title={t.store.related} />
+        <CellGrid cols={3} as="ul">
+          {related.map((r) => (
+            <ProductCard
+              slug={productSlug(r)}
+              href={productHref(r)}
+              title={r.data.title}
+              category={r.data.category}
+              price={fromPrice(r)}
+              fromPrice={r.data.variants.length > 1}
+              variant={r.data.variants[0]?.id ?? ''}
+              digital={r.data.digital}
+              image={r.data.images[0]!.src}
+              alt={r.data.images[0]!.alt}
+              locale={locale}
+            />
+          ))}
+        </CellGrid>
+      </section>
+    )
+  }
+</BaseLayout>
+
+<style>
+  @layer components {
+    .product-crumbs {
+      padding-block: var(--space-md);
+    }
+
+    .product {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    @media (min-width: 56rem) {
+      .product {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      }
+
+      .product__info {
+        border-inline-start: var(--line-width) solid var(--color-line);
+      }
+
+      .product__media {
+        position: sticky;
+        inset-block-start: var(--header-h);
+        align-self: start;
+      }
+    }
+
+    .product__media {
+      padding: var(--cell-pad) var(--gutter);
+    }
+
+    .product__info {
+      display: grid;
+      align-content: start;
+    }
+
+    .product__block {
+      padding: var(--cell-pad-lg) var(--gutter);
+      border-block-start: var(--line-width) solid var(--color-line);
+    }
+
+    .product__block:first-child {
+      border-block-start: 0;
+    }
+
+    .product__head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: var(--space-lg);
+    }
+
+    .product__price {
+      font-family: var(--font-mono);
+      font-size: var(--text-md);
+      font-weight: var(--weight-strong);
+      white-space: nowrap;
+    }
+
+    .product__story {
+      display: grid;
+      gap: var(--space-sm);
+    }
+
+    .product__story :global(p) {
+      max-inline-size: var(--measure);
+    }
+
+    .product__form {
+      display: grid;
+      gap: var(--space-lg);
+    }
+
+    .product__buy {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-sm);
+    }
+
+    .product__buy :global(.product__add) {
+      flex: 1;
+    }
+
+    .product__ship {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: var(--space-sm);
+      padding-block: var(--space-md);
+    }
+
+    .product__acc {
+      padding-block: 0;
+    }
+  }
+</style>

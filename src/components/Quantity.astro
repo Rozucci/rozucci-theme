@@ -1,0 +1,68 @@
+---
+/**
+ * Quantity — [ − ] 01 [ + ] as three hairline cells. The number input works
+ * on its own; the step buttons are enhanced by src/scripts/cart.ts.
+ */
+interface Props {
+  label: string;
+  decrease: string;
+  increase: string;
+  name?: string;
+  value?: number;
+  min?: number;
+  max?: number;
+  id?: string;
+}
+
+const { label, decrease, increase, name = 'qty', value = 1, min = 1, max = 99, id = 'qty' } = Astro.props;
+---
+
+<div class="qty" data-qty>
+  <label class="visually-hidden" for={id}>{label}</label>
+  <button type="button" class="qty__btn u-js-only" data-qty-step="-1" aria-label={decrease}><span aria-hidden="true">−</span></button>
+  <input class="qty__input" id={id} type="number" name={name} value={value} min={min} max={max} inputmode="numeric" lang="en" />
+  <button type="button" class="qty__btn u-js-only" data-qty-step="1" aria-label={increase}><span aria-hidden="true">+</span></button>
+</div>
+
+<style>
+  @layer components {
+    .qty {
+      display: inline-flex;
+      border: var(--line-width) solid var(--color-line-strong);
+      block-size: var(--button-height);
+    }
+
+    .qty__btn {
+      inline-size: var(--button-height);
+      font-family: var(--font-mono);
+      color: var(--color-ink);
+      transition: background-color var(--dur-hover) var(--ease-standard);
+    }
+
+    .qty__btn:hover {
+      background: var(--color-surface);
+    }
+
+    .qty__input {
+      inline-size: var(--space-3xl);
+      border: 0;
+      border-inline: var(--line-width) solid var(--color-line);
+      background: transparent;
+      font-family: var(--font-mono);
+      font-size: var(--text-sm);
+      text-align: center;
+      appearance: textfield;
+      -moz-appearance: textfield;
+    }
+
+    .qty__input::-webkit-inner-spin-button,
+    .qty__input::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    :global(html:not(.js)) .qty__input {
+      border-inline: 0;
+    }
+  }
+</style>

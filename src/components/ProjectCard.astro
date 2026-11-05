@@ -5,7 +5,7 @@
  *   (03)  INDEX OF NIGHTS            WEB · 2025
  *   [ media 4:5 ]
  *
- * `data-discipline` is used by the work index filter; `data-cursor="view"`
+ * `data-filter-key` is used by the work index filter; `data-cursor="view"`
  * shows the desktop cursor label.
  */
 import type { ImageMetadata } from 'astro';
@@ -47,7 +47,7 @@ const {
 const t = useTranslations(locale);
 ---
 
-<Tag class="project-card" data-discipline={discipline} data-flip-item>
+<Tag class="project-card" data-filter-item data-filter-key={discipline} data-flip-item>
   <a class="project-card__link" href={href} data-cursor="view">
     <div class="project-card__meta">
       <span class="t-label u-muted"><bdi lang="en">({code(index)})</bdi></span>

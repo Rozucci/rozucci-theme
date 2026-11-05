@@ -1,0 +1,45 @@
+/*
+ * Theme: SAGE — green ground, black ink and hairlines, everything in mono.
+ * Customisations: monospace display and text, sentence-case labels.
+ */
+@layer tokens.themes {
+  [data-theme='sage'] {
+    --color-ground: light-dark(var(--p-sage-350), var(--p-moss-950));
+    --color-canvas: light-dark(var(--p-sage-300), var(--p-moss-950));
+    --color-surface: light-dark(var(--p-sage-200), var(--p-moss-900));
+    --color-surface-2: light-dark(var(--p-sage-400), var(--p-moss-850));
+    --color-ink: light-dark(var(--p-sage-950), var(--p-moss-50));
+    --color-ink-muted: light-dark(var(--p-sage-800), var(--p-moss-200));
+    --color-ink-subtle: light-dark(var(--p-sage-600), var(--p-moss-500));
+    --color-line: light-dark(var(--p-sage-950), var(--p-moss-600));
+    --color-line-strong: light-dark(var(--p-sage-950), var(--p-moss-50));
+
+    --color-accent: light-dark(var(--p-leaf-700), var(--p-leaf-300));
+    --color-accent-ink: light-dark(var(--p-leaf-700), var(--p-leaf-300));
+    --color-on-accent: light-dark(var(--p-leaf-50), var(--p-sage-950));
+    --color-accent-2: light-dark(var(--p-sage-800), var(--p-moss-200));
+    --color-accent-3: light-dark(var(--p-sage-600), var(--p-moss-500));
+
+    --color-focus: var(--color-ink);
+    --color-media: light-dark(var(--p-sage-200), var(--p-moss-900));
+    --color-selection: light-dark(var(--p-sage-950), var(--p-moss-50));
+    --color-on-selection: light-dark(var(--p-sage-300), var(--p-moss-950));
+
+    --color-notch-ground: light-dark(var(--p-sage-400), var(--p-moss-900));
+    --color-notch-card: light-dark(var(--p-sage-200), var(--p-moss-850));
+    --color-notch-ink: light-dark(var(--p-sage-950), var(--p-moss-50));
+    --color-notch-label: light-dark(var(--p-sage-800), var(--p-moss-200));
+    --color-notch-line: light-dark(var(--p-sage-950), var(--p-moss-600));
+
+    /* customisations */
+    --font-display-latin: var(--p-font-roboto-mono), var(--p-font-system-mono);
+    --font-text-latin: var(--p-font-roboto-mono), var(--p-font-system-mono);
+    --weight-display-latin: var(--p-weight-500);
+    --tracking-display-latin: var(--p-tracking-0);
+    --leading-display-latin: var(--p-leading-1-15);
+    --leading-heading-latin: var(--p-leading-1-25);
+    --label-tracking-latin: var(--p-tracking-label-tight);
+    --em-style: normal;
+    --em-color: var(--color-accent-ink);
+  }
+}

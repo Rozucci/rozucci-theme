@@ -6,6 +6,7 @@
  */
 @layer tokens.themes {
   [data-theme='bone'] {
+    --color-ground: light-dark(var(--p-stone-400), var(--p-cap-950));
     --color-canvas: light-dark(var(--p-stone-400), var(--p-cap-950));
     --color-surface: light-dark(var(--p-bone-100), var(--p-cap-900));
     --color-surface-2: light-dark(var(--p-bone-100), var(--p-cap-800));

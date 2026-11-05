@@ -25,7 +25,7 @@ export interface NavItem {
   /** Route without locale prefix, with trailing slash. */
   href: string;
   /** Key in the i18n dictionary under `nav`. */
-  key: 'work' | 'orbit' | 'about' | 'contact';
+  key: 'work' | 'orbit' | 'shop' | 'about' | 'contact';
 }
 
 export interface SocialLink {
@@ -33,7 +33,7 @@ export interface SocialLink {
   href: string;
 }
 
-export type ThemeName = 'ivory' | 'bone';
+export type ThemeName = 'ivory' | 'bone' | 'stone' | 'sand' | 'paper' | 'studio' | 'sage';
 export type ColorMode = 'auto' | 'light' | 'dark';
 
 export const site = {
@@ -54,6 +54,7 @@ export const site = {
   nav: [
     { href: '/work/', key: 'work' },
     { href: '/orbit/', key: 'orbit' },
+    { href: '/shop/', key: 'shop' },
     { href: '/about/', key: 'about' },
     { href: '/contact/', key: 'contact' },
   ] satisfies NavItem[],
@@ -65,11 +66,32 @@ export const site = {
     { label: 'Pinterest', href: 'https://pinterest.com/' },
   ] satisfies SocialLink[],
 
-  /** Themes that exist in src/styles/themes/. The first is not special. */
-  themes: ['ivory', 'bone'] satisfies ThemeName[],
+  /**
+   * Themes that exist in src/styles/themes/ (each file = one theme). The
+   * footer and /styleguide switchers cycle through this list. Remove a name
+   * here to hide a theme; delete its CSS import in global.css to drop it.
+   */
+  themes: ['ivory', 'bone', 'stone', 'sand', 'paper', 'studio', 'sage'] satisfies ThemeName[],
   defaultTheme: 'ivory' as ThemeName,
   /** `auto` follows the operating system (prefers-color-scheme). */
   defaultMode: 'auto' as ColorMode,
+
+  /**
+   * Store (demo). Catalog, product pages and a browser-only cart. Checkout is
+   * not connected — plug a commerce backend in later (see README). Set
+   * `enabled: false` to hide the shop nav item and the header cart.
+   */
+  store: {
+    enabled: true,
+    currency: 'USD',
+    /** Prices always render with Latin digits, in this locale's format. */
+    priceLocale: 'en-US',
+    freeShippingFrom: 60,
+    shipsInDays: '3–5',
+  },
+
+  /** Thin bar above the header (text lives in i18n → announcement). */
+  announcement: true,
 
   /**
    * Motion feature flags. Turn any feature off here and it is removed

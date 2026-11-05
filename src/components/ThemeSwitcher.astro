@@ -1,0 +1,80 @@
+---
+/**
+ * ThemeSwitcher — cycles the themes listed in site.config (ivory → bone →
+ * stone → …). Stored in localStorage ('rz-theme'), applied before first paint
+ * by the head bootstrap. Theme names are codes: Latin in both locales.
+ */
+import type { LocaleCode } from '../site.config';
+import { site } from '../site.config';
+import { useTranslations } from '../i18n/utils';
+
+interface Props {
+  locale: LocaleCode;
+  class?: string;
+}
+
+const { locale, class: className } = Astro.props;
+const t = useTranslations(locale);
+---
+
+<button
+  type="button"
+  class:list={['theme-switch', 't-label', className]}
+  data-theme-switch
+  data-themes={site.themes.join(',')}
+  data-name={t.themeSwitcher}
+  aria-label={`${t.themeSwitcher}: ${site.defaultTheme}`}
+>
+  <span>{t.themeSwitcher}</span>
+  <bdi lang="en">[&nbsp;<span data-theme-label>{site.defaultTheme}</span>&nbsp;]</bdi>
+</button>
+
+<style>
+  @layer components {
+    .theme-switch {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-xs);
+      min-block-size: var(--hit-target);
+      color: var(--color-ink);
+      justify-self: start;
+    }
+
+    .theme-switch:hover [data-theme-label] {
+      text-decoration: underline;
+      text-decoration-thickness: var(--line-width);
+      text-underline-offset: 0.25em;
+    }
+  }
+</style>
+
+<script>
+  const html = document.documentElement;
+
+  function render() {
+    document.querySelectorAll<HTMLButtonElement>('[data-theme-switch]').forEach((btn) => {
+      const name = html.dataset.theme ?? '';
+      const out = btn.querySelector('[data-theme-label]');
+      if (out) out.textContent = name;
+      btn.setAttribute('aria-label', `${btn.dataset.name}: ${name}`);
+    });
+  }
+
+  document.addEventListener('click', (e) => {
+    const btn = (e.target as Element | null)?.closest<HTMLButtonElement>('[data-theme-switch]');
+    if (!btn) return;
+    const themes = (btn.dataset.themes ?? '').split(',').filter(Boolean);
+    const next = themes[(themes.indexOf(html.dataset.theme ?? '') + 1) % themes.length];
+    if (!next) return;
+    html.dataset.theme = next;
+    try {
+      localStorage.setItem('rz-theme', next);
+    } catch {
+      /* storage blocked — theme lasts for this page view */
+    }
+    render();
+  });
+  new MutationObserver(render).observe(html, { attributes: true, attributeFilter: ['data-theme'] });
+  document.addEventListener('astro:page-load', render);
+  render();
+</script>
