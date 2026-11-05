@@ -230,6 +230,16 @@ as Snipcart or Shopify's Storefront API, or your own), and point the checkout
 button at the provider. Product data can stay in the content collection or be
 fetched at build time.
 
+### Offline package (open with a double-click)
+
+```bash
+npm run offline
+```
+
+Writes `dist-offline/`: the whole site with relative links and every page's
+scripts inlined, so `index.html` opens straight from the disk (no server, no
+internet). View transitions are off in this build; everything else works.
+
 ### Deploy
 
 `npm run build` writes a fully static site to `dist/` — upload it to any

@@ -108,7 +108,9 @@ export const site = {
     /** Gentle parallax on media. */
     parallax: true,
     /** Astro view transitions between pages (crossfade + line wipe). */
-    pageTransitions: true,
+    // Off in the offline package (OFFLINE=true): view transitions fetch pages,
+    // which browsers block on file:// URLs.
+    pageTransitions: !(typeof process !== 'undefined' && process.env?.OFFLINE === 'true'),
     /** Desktop-only `[ VIEW ]` label following the cursor over project cards. */
     cursorLabel: true,
     /** Flip animation when filtering the work index. */

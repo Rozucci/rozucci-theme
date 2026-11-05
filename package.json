@@ -2,7 +2,7 @@
   "name": "rozucci-theme",
   "version": "0.1.0",
   "private": true,
-  "description": "Reusable bilingual (fa/en) Astro theme for Rozucci — warm editorial grid.",
+  "description": "Reusable bilingual (fa/en) Astro theme for Rozucci \u2014 warm editorial grid.",
   "type": "module",
   "repository": {
     "type": "git",
@@ -16,7 +16,8 @@
     "fonts": "node scripts/copy-fonts.mjs",
     "fonts:subset": "python3 scripts/subset-fa.py",
     "placeholders": "node scripts/gen-placeholders.mjs",
-    "astro": "astro"
+    "astro": "astro",
+    "offline": "OFFLINE=true astro build --outDir dist-offline && node scripts/make-offline.mjs dist-offline"
   },
   "engines": {
     "node": ">=22.23.4"
