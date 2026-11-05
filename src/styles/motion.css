@@ -1,12 +1,121 @@
 /*
- * Global motion states.
+ * Global motion styles.
  *
- * Hide-before-reveal styles apply ONLY under `html.js.motion`. The inline
- * head script adds `.motion` when motion flags allow it and the visitor has
- * not asked for reduced motion; a safety timer removes it if the motion
+ * Hide-before-reveal states apply ONLY under `html.js.motion`. The inline
+ * head bootstrap adds `.motion` when motion flags allow it and the visitor
+ * has not asked for reduced motion; a safety timer removes it if the motion
  * bundle never starts. Without JS every element is visible.
+ *
+ * The states sit in the utilities layer so they win over component defaults
+ * (e.g. CellGrid's --cg-draw: 1); GSAP then animates inline values.
  */
+@layer utilities {
+  html.js.motion .section:not(.section--flush) {
+    --draw: 0;
+  }
+
+  html.js.motion [data-cell-grid] {
+    --cg-draw: 0;
+  }
+
+  html.js.motion [data-reveal='up'] {
+    opacity: 0;
+  }
+
+  html.js.motion [data-reveal='lines'] {
+    visibility: hidden;
+  }
+
+  html.js.motion [data-reveal='media'] .media__frame {
+    clip-path: inset(100% 0 0 0);
+  }
+
+  /* SplitText line masks: give glyphs room so the mask never clips them. */
+  .rz-line-mask {
+    padding-block: var(--split-bleed);
+    margin-block: calc(-1 * var(--split-bleed));
+  }
+}
+
 @layer base {
+  /* Lenis (from lenis/dist/lenis.css, kept inside our layers). */
+  html.lenis,
+  html.lenis body {
+    block-size: auto;
+  }
+
+  .lenis:not(.lenis-autoToggle).lenis-stopped {
+    overflow: clip;
+  }
+
+  .lenis [data-lenis-prevent] {
+    overscroll-behavior: contain;
+  }
+
+  .lenis.lenis-smooth iframe {
+    pointer-events: none;
+  }
+
+  /* Page transition: short crossfade; header and page line stay in place. */
+  @media (prefers-reduced-motion: no-preference) {
+    ::view-transition-old(root) {
+      animation: rz-vt-out var(--dur-fast) var(--ease-standard) both;
+    }
+
+    ::view-transition-new(root) {
+      animation: rz-vt-in var(--dur-medium) var(--ease-out) both;
+    }
+  }
+
+  @keyframes rz-vt-out {
+    to {
+      opacity: 0;
+    }
+  }
+
+  @keyframes rz-vt-in {
+    from {
+      opacity: 0;
+    }
+  }
+
+  /* Thin line that wipes across the top while the next page loads. */
+  .page-line {
+    position: fixed;
+    inset-inline: 0;
+    inset-block-start: 0;
+    z-index: var(--z-overlay);
+    block-size: var(--line-width-strong);
+    background: var(--color-ink);
+    transform: scaleX(0);
+    transform-origin: var(--origin-inline-start);
+    pointer-events: none;
+    view-transition-name: rz-page-line;
+  }
+
+  /*
+   * Cursor label. Pointer coordinates are physical, so this one element is
+   * positioned with physical top/left on purpose (the only exception).
+   */
+  .cursor-label {
+    position: fixed;
+    inset: 0 auto auto 0;
+    z-index: var(--z-cursor);
+    padding: var(--space-2xs) var(--space-xs);
+    background: var(--color-ink);
+    color: var(--color-canvas);
+    pointer-events: none;
+    visibility: hidden;
+    opacity: 0;
+    white-space: nowrap;
+  }
+
+  @media (hover: none), (pointer: coarse) {
+    .cursor-label {
+      display: none;
+    }
+  }
+
   @media (prefers-reduced-motion: reduce) {
     *,
     *::before,
@@ -15,6 +124,10 @@
       animation-iteration-count: 1 !important;
       transition-duration: var(--dur-instant) !important;
       scroll-behavior: auto !important;
+    }
+
+    .cursor-label {
+      display: none;
     }
   }
 }

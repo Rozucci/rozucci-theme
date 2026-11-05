@@ -71,6 +71,7 @@ const sections = [
   { id: 'notch', title: 'NotchCard' },
   { id: 'themes', title: 'Themes' },
   { id: 'store', title: 'Store kit' },
+  { id: 'motion', title: 'Motion' },
 ];
 
 const themeNotes: Record<string, string> = {
@@ -497,6 +498,55 @@ const themeNotes: Record<string, string> = {
         </CellGrid>
       </section>
 
+      <section class="section" id="motion" aria-labelledby="motion-demo-title">
+        <header class="pad sg-section-head">
+          <span class="t-label u-muted">{indexSign(12)}</span>
+          <h2 id="motion-demo-title" class="t-xl">Motion</h2>
+        </header>
+        <div class="pad sg-demo stack stack-lg" data-motion-demo>
+          <p class="measure u-muted">
+            Calm and mechanical: <code>--ease-out</code> (expo.out) and <code>--ease-standard</code>
+            (power3.out), durations from <code>--dur-*</code>. Every move below plays on scroll; the
+            button replays them. Flags live in <code>src/site.config.ts → motion</code>; reduced
+            motion disables all of them.
+          </p>
+          <div class="cluster">
+            <button type="button" class="t-label sg-btn" data-motion-replay>[ replay ]</button>
+            <span class="t-label u-muted" data-motion-state></span>
+          </div>
+          <CellGrid cols={3} frame>
+            <div class="pad-cell stack">
+              <Label>(a) Hairline draw</Label>
+              <span class="sg-rule" data-demo="draw" />
+            </div>
+            <div class="pad-cell stack">
+              <Label>(b) Lines — en</Label>
+              <p class="t-lg" data-demo="lines">Image, motion and code — one practice, built alone.</p>
+            </div>
+            <div class="pad-cell stack" lang="fa" dir="rtl">
+              <Label>(c) Lines — fa (never chars)</Label>
+              <p class="t-lg" data-demo="lines">تصویر، حرکت و کد — یک تمرین، تنها ساخته‌شده.</p>
+            </div>
+            <div class="pad-cell stack">
+              <Label>(d) Media wipe + settle</Label>
+              <MediaFrame src={detail2} alt="" ratio="square" sizes="33vw" reveal={false} class="sg-media-demo" />
+            </div>
+            <div class="pad-cell stack">
+              <Label>(e) Rise (batched)</Label>
+              <div class="stack stack-sm">
+                <span class="t-label" data-demo="up">[ 01 ] first</span>
+                <span class="t-label" data-demo="up">[ 02 ] second</span>
+                <span class="t-label" data-demo="up">[ 03 ] third</span>
+              </div>
+            </div>
+            <div class="pad-cell stack">
+              <Label>(f) Cursor label</Label>
+              <a href="#motion" class="sg-cursor-demo t-label" data-cursor="view">Hover me (desktop)</a>
+            </div>
+          </CellGrid>
+        </div>
+      </section>
+
       <slot />
     </div>
   </div>
@@ -715,6 +765,21 @@ const themeNotes: Record<string, string> = {
       display: inline-flex;
     }
 
+    .sg-rule {
+      display: block;
+      block-size: var(--line-width-strong);
+      background: var(--color-ink);
+      transform-origin: var(--origin-inline-start);
+    }
+
+    .sg-cursor-demo {
+      display: grid;
+      place-items: center;
+      min-block-size: var(--space-4xl);
+      border: var(--line-width) dashed var(--color-line-strong);
+      text-decoration: none;
+    }
+
     .sg-theme__swatches span {
       inline-size: var(--space-md);
       block-size: var(--space-md);
@@ -826,4 +891,43 @@ const themeNotes: Record<string, string> = {
   } else {
     init();
   }
+</script>
+
+<script>
+  /* Motion demos: replayable versions of the site's signature moves. */
+  import { gsap } from 'gsap';
+  import { SplitText } from 'gsap/SplitText';
+  import { motion } from '../motion/config';
+  import { onPageLoad } from '../scripts/lifecycle';
+
+  gsap.registerPlugin(SplitText);
+
+  onPageLoad(() => {
+    const root = document.querySelector<HTMLElement>('[data-motion-demo]');
+    if (!root) return;
+    const state = root.querySelector('[data-motion-state]');
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (state) state.textContent = reduce ? 'reduced motion: demos are static' : '';
+    const splits = [...root.querySelectorAll<HTMLElement>('[data-demo="lines"]')].map((el) =>
+      SplitText.create(el, { type: 'lines', mask: 'lines', linesClass: 'rz-line' }),
+    );
+
+    const play = () => {
+      if (reduce) return;
+      const out = motion.ease('out');
+      const tl = gsap.timeline();
+      tl.fromTo(root.querySelectorAll('[data-demo="draw"]'), { scaleX: 0 }, { scaleX: 1, duration: motion.dur('slower'), ease: out }, 0);
+      splits.forEach((s) =>
+        tl.fromTo(s.lines, { yPercent: 110 }, { yPercent: 0, duration: motion.dur('slow'), ease: out, stagger: motion.stagger() * 1.5 }, 0.1),
+      );
+      const frame = root.querySelector('.sg-media-demo .media__frame');
+      const img = root.querySelector('.sg-media-demo img');
+      if (frame) tl.fromTo(frame, { clipPath: 'inset(100% 0% 0% 0%)' }, { clipPath: 'inset(0% 0% 0% 0%)', duration: motion.dur('slow'), ease: out }, 0.15);
+      if (img) tl.fromTo(img, { scale: motion.settleScale() }, { scale: 1, duration: motion.dur('slower'), ease: out }, 0.15);
+      tl.fromTo(root.querySelectorAll('[data-demo="up"]'), { opacity: 0, y: motion.px('distance') }, { opacity: 1, y: 0, duration: motion.dur('slow'), ease: out, stagger: motion.stagger() }, 0.2);
+    };
+
+    root.querySelector('[data-motion-replay]')?.addEventListener('click', play);
+    document.addEventListener('astro:before-swap', () => splits.forEach((s) => s.revert()), { once: true });
+  });
 </script>

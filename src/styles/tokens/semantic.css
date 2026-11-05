@@ -172,6 +172,7 @@
     --motion-nudge: var(--p-distance-8); /* hover offset */
     --parallax-amount: var(--p-percent-6);
     --media-settle-scale: var(--p-scale-1-06);
+    --split-bleed: var(--p-em-0-12); /* room for ascenders/descenders in masked lines */
     --stagger: 0.06; /* seconds between staggered items (unitless for GSAP) */
 
     /* -------- Layers -------- */

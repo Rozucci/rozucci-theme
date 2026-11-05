@@ -47,6 +47,7 @@ const t = useTranslations(locale);
   </head>
   <body>
     <a class="skip-link" href="#main">{t.a11y.skipToContent}</a>
+    {site.motion.pageTransitions && <div class="page-line" data-page-line aria-hidden="true" transition:persist="rz-page-line" />}
     <div class="container frame">
       {!bare && site.announcement && <AnnouncementBar text={t.announcement} />}
       {!bare && <Header locale={locale} />}
@@ -55,6 +56,11 @@ const t = useTranslations(locale);
       </main>
       {!bare && <Footer locale={locale} />}
     </div>
+    {
+      site.motion.cursorLabel && (
+        <div class="cursor-label t-label" data-cursor-label aria-hidden="true">[&nbsp;{t.actions.view}&nbsp;]</div>
+      )
+    }
     <script>
       import '../motion/index';
       import '../scripts/cart';
