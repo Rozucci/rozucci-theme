@@ -1,0 +1,205 @@
+---
+/**
+ * ProjectLayout — project detail: title, hairline meta table, hero media,
+ * notes, media sequence, credits, next project.
+ */
+import BaseLayout from './BaseLayout.astro';
+import CellGrid from '../components/CellGrid.astro';
+import Label from '../components/Label.astro';
+import MediaFrame from '../components/MediaFrame.astro';
+import TextLink from '../components/TextLink.astro';
+import Arrow from '../components/Arrow.astro';
+import type { LocaleCode } from '../site.config';
+import { code, localizePath, useTranslations, year } from '../i18n/utils';
+import { projectHref, type Project } from '../lib/projects';
+
+interface Props {
+  locale: LocaleCode;
+  project: Project;
+  next: Project;
+  alternateLocales: LocaleCode[];
+}
+
+const { locale, project, next, alternateLocales } = Astro.props;
+const t = useTranslations(locale);
+const p = project.data;
+const [hero, ...sequence] = p.media;
+---
+
+<BaseLayout locale={locale} title={p.title} description={p.summary} alternateLocales={alternateLocales}>
+  <article class="project">
+    <header class="section section--flush pad project__head">
+      <TextLink href={localizePath('/work/', locale)} arrow="back" variant="label">{t.project.index}</TextLink>
+      <div class="project__title-row">
+        <span class="t-label u-muted"><bdi lang="en">({code(p.order)})</bdi></span>
+        <h1 class="t-2xl" data-reveal="lines">{p.title}</h1>
+      </div>
+      <p class="project__summary t-md u-muted measure">{p.summary}</p>
+    </header>
+
+    <section class="section" aria-label={t.project.details}>
+      <CellGrid cols={4} colsSm={2} as="dl" class="project__meta">
+        <div class="project__meta-cell">
+          <Label as="dt">{t.project.year}</Label>
+          <dd>{year(p.year, locale)}</dd>
+        </div>
+        <div class="project__meta-cell">
+          <Label as="dt">{t.project.discipline}</Label>
+          <dd>{t.disciplines[p.discipline].name}</dd>
+        </div>
+        <div class="project__meta-cell">
+          <Label as="dt">{t.project.tools}</Label>
+          <dd><bdi lang="en">{p.tools.join(', ')}</bdi></dd>
+        </div>
+        <div class="project__meta-cell">
+          <Label as="dt">{t.project.role}</Label>
+          <dd>{p.role}</dd>
+        </div>
+      </CellGrid>
+    </section>
+
+    {
+      hero && (
+        <div class="section pad project__hero">
+          <MediaFrame src={hero.src} alt={hero.alt} ratio={hero.ratio} caption={hero.caption} priority sizes="(min-width: 90rem) 1400px, 100vw" widths={[640, 960, 1280, 1600, 2400]} parallax />
+        </div>
+      )
+    }
+
+    <section class="section split pad project__notes">
+      <Label>{t.project.notes}</Label>
+      <div class="project__body measure">
+        <slot />
+      </div>
+    </section>
+
+    {
+      sequence.length > 0 && (
+        <section class="section" aria-label={t.project.media}>
+          <CellGrid cols={2} colsSm={1}>
+            {sequence.map((m) => (
+              <div class:list={['project__media-cell', { 'span-full': m.wide }]}>
+                <MediaFrame src={m.src} alt={m.alt} ratio={m.ratio} caption={m.caption} sizes="(min-width: 64rem) 50vw, 100vw" />
+              </div>
+            ))}
+          </CellGrid>
+        </section>
+      )
+    }
+
+    {
+      p.credits.length > 0 && (
+        <section class="section split pad project__credits" aria-labelledby="credits">
+          <Label as="h2" id="credits">{t.project.credits}</Label>
+          <dl class="project__credit-list">
+            {p.credits.map((c) => (
+              <div>
+                <dt class="t-label u-muted">{c.role}</dt>
+                <dd>{c.name}</dd>
+              </div>
+            ))}
+          </dl>
+        </section>
+      )
+    }
+
+    <nav class="section" aria-label={t.project.next}>
+      <a class="project__next pad" href={projectHref(next)} data-cursor="view">
+        <Label>{t.project.next}</Label>
+        <span class="project__next-title t-xl">
+          {next.data.title}
+          <Arrow />
+        </span>
+      </a>
+    </nav>
+  </article>
+</BaseLayout>
+
+<style>
+  @layer components {
+    .project__head {
+      display: grid;
+      gap: var(--space-lg);
+      padding-block: var(--space-xl) var(--space-2xl);
+    }
+
+    .project__title-row {
+      display: grid;
+      gap: var(--space-sm);
+    }
+
+    .project__meta-cell {
+      display: grid;
+      align-content: start;
+      gap: var(--space-xs);
+      padding: var(--cell-pad) var(--gutter);
+    }
+
+    .project__meta-cell dd {
+      margin: 0;
+    }
+
+    .project__hero {
+      padding-block: var(--space-lg);
+    }
+
+    .project__notes,
+    .project__credits {
+      padding-block: var(--space-2xl);
+    }
+
+    .project__body :global(p) {
+      margin-block-end: var(--space-md);
+    }
+
+    .project__body :global(h2) {
+      font-size: var(--text-lg);
+      margin-block: var(--space-xl) var(--space-sm);
+    }
+
+    .project__media-cell {
+      padding: var(--cell-pad) var(--gutter);
+    }
+
+    .project__credit-list {
+      display: grid;
+      gap: var(--space-sm);
+      margin: 0;
+    }
+
+    .project__credit-list div {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+      gap: var(--space-md);
+      padding-block-end: var(--space-sm);
+      border-block-end: var(--line-width) solid var(--color-line);
+    }
+
+    .project__credit-list dd {
+      margin: 0;
+    }
+
+    .project__next {
+      display: grid;
+      gap: var(--space-sm);
+      padding-block: var(--space-3xl);
+      color: inherit;
+      text-decoration: none;
+      transition: background-color var(--dur-fast) var(--ease-standard);
+    }
+
+    .project__next:hover {
+      background: var(--color-surface);
+    }
+
+    .project__next-title {
+      display: inline-flex;
+      align-items: baseline;
+      gap: var(--space-md);
+    }
+
+    .project__next:hover :global(.arrow) {
+      translate: calc(var(--dir-sign) * var(--motion-nudge)) 0;
+    }
+  }
+</style>

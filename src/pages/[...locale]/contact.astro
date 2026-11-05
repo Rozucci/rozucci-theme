@@ -1,0 +1,96 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import CellGrid from '../../components/CellGrid.astro';
+import Label from '../../components/Label.astro';
+import SectionHead from '../../components/SectionHead.astro';
+import TextLink from '../../components/TextLink.astro';
+import Arrow from '../../components/Arrow.astro';
+import type { LocaleCode } from '../../site.config';
+import { site } from '../../site.config';
+import { localeStaticPaths, useTranslations } from '../../i18n/utils';
+
+export function getStaticPaths() {
+  return localeStaticPaths();
+}
+
+interface Props {
+  locale: LocaleCode;
+}
+
+const { locale } = Astro.props;
+const t = useTranslations(locale);
+---
+
+<BaseLayout locale={locale} title={t.contact.title} description={t.contact.lead}>
+  <section class="section section--flush" aria-labelledby="contact-title">
+    <SectionHead index={1} id="contact-title" level="h1" size="2xl" title={t.contact.title} lead={t.contact.lead} />
+    <div class="pad contact-email">
+      <Label>{t.contact.emailLabel}</Label>
+      <a class="contact-email__link t-2xl" href={`mailto:${site.email}`}>
+        <bdi lang="en">{site.email}</bdi>
+        <Arrow />
+      </a>
+    </div>
+  </section>
+
+  <section class="section">
+    <CellGrid cols={3} colsSm={1}>
+      <div class="contact-cell">
+        <Label as="h2">{t.contact.socialLabel}</Label>
+        <ul role="list" class="stack stack-sm">
+          {
+            site.socials.map((s) => (
+              <li>
+                <TextLink href={s.href} externalNote={t.a11y.opensInNewTab}>
+                  <bdi lang="en">{s.label}</bdi>
+                </TextLink>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+      <div class="contact-cell">
+        <Label as="h2">{t.contact.availabilityLabel}</Label>
+        <p>{t.contact.availability}</p>
+      </div>
+      <div class="contact-cell">
+        <Label as="h2">{t.contact.locationLabel}</Label>
+        <p>{t.contact.location}</p>
+      </div>
+    </CellGrid>
+  </section>
+</BaseLayout>
+
+<style>
+  @layer components {
+    .contact-email {
+      display: grid;
+      gap: var(--space-md);
+      padding-block: var(--space-xl) var(--space-4xl);
+    }
+
+    .contact-email__link {
+      display: inline-flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: var(--space-md);
+      font-family: var(--font-display);
+      text-decoration: none;
+      overflow-wrap: anywhere;
+    }
+
+    .contact-email__link:hover {
+      text-decoration: underline;
+      text-decoration-thickness: var(--line-width);
+      text-underline-offset: 0.15em;
+    }
+
+    .contact-cell {
+      display: grid;
+      align-content: start;
+      gap: var(--space-md);
+      min-block-size: var(--space-5xl);
+      padding: var(--cell-pad-lg) var(--gutter);
+    }
+  }
+</style>

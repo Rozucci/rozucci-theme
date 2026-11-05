@@ -35,21 +35,20 @@ const {
 
 <Tag class:list={['t-label', 'label', `label--${tone}`, className]} {...rest}>
   {index !== undefined && <bdi lang="en" class="label__index">{indexSign(index)}</bdi>}
-  {bracket && <span aria-hidden="true">[&nbsp;</span>}
-  {code ? (<bdi lang="en"><slot /></bdi>) : <slot />}
-  {bracket && <span aria-hidden="true">&nbsp;]</span>}
+  <span class="label__text">
+    {bracket && <span aria-hidden="true">[&nbsp;</span>}
+    {code ? (<bdi lang="en"><slot /></bdi>) : <slot />}
+    {bracket && <span aria-hidden="true">&nbsp;]</span>}
+  </span>
 </Tag>
 
 <style>
   @layer components {
+    /* gap (not margin) — a <bdi> resolves logical margins in its own direction */
     .label {
       display: inline-flex;
       align-items: baseline;
-      gap: 0;
-    }
-
-    .label__index {
-      margin-inline-end: var(--space-xs);
+      gap: var(--space-xs);
     }
 
     .label--muted {

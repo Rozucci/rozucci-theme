@@ -1,0 +1,89 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import CellGrid from '../../components/CellGrid.astro';
+import Label from '../../components/Label.astro';
+import SectionHead from '../../components/SectionHead.astro';
+import TextLink from '../../components/TextLink.astro';
+import type { LocaleCode } from '../../site.config';
+import { code, localeStaticPaths, localizePath, useTranslations } from '../../i18n/utils';
+import { DISCIPLINES } from '../../data/disciplines';
+
+export function getStaticPaths() {
+  return localeStaticPaths();
+}
+
+interface Props {
+  locale: LocaleCode;
+}
+
+const { locale } = Astro.props;
+const t = useTranslations(locale);
+---
+
+<BaseLayout locale={locale} title={t.about.title} description={t.about.lead}>
+  <section class="section section--flush" aria-labelledby="about-title">
+    <SectionHead index={1} id="about-title" level="h1" size="2xl" title={t.about.title} />
+    <div class="split pad about-intro">
+      <span></span>
+      <div class="stack stack-lg">
+        <p class="t-xl" data-reveal="lines">{t.about.lead}</p>
+        {t.about.body.map((para) => <p class="measure about-body">{para}</p>)}
+      </div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="about-principles">
+    <SectionHead index={2} id="about-principles" title={t.about.principlesTitle} />
+    <CellGrid cols={3} colsSm={2} as="ol">
+      {
+        t.about.principles.map((p, i) => (
+          <li class="about-cell">
+            <span class="t-label u-muted"><bdi lang="en">({code(i + 1)})</bdi></span>
+            <span class="t-lg about-cell__name">{p}</span>
+          </li>
+        ))
+      }
+    </CellGrid>
+  </section>
+
+  <section class="section" aria-labelledby="about-capabilities">
+    <SectionHead index={3} id="about-capabilities" title={t.about.capabilitiesTitle}>
+      <TextLink slot="action" href={localizePath('/work/', locale)} variant="label">{t.actions.viewAll}</TextLink>
+    </SectionHead>
+    <CellGrid cols={3} colsSm={1} as="ul">
+      {
+        DISCIPLINES.map((d) => (
+          <li class="about-cell">
+            <Label>{t.disciplines[d].name}</Label>
+            <span class="about-cell__note">{t.disciplines[d].note}</span>
+          </li>
+        ))
+      }
+    </CellGrid>
+  </section>
+</BaseLayout>
+
+<style>
+  @layer components {
+    .about-intro {
+      padding-block: var(--space-lg) var(--space-3xl);
+    }
+
+    .about-body {
+      font-size: var(--text-md);
+      line-height: var(--leading-body);
+    }
+
+    .about-cell {
+      display: grid;
+      align-content: start;
+      gap: var(--space-sm);
+      min-block-size: var(--space-5xl);
+      padding: var(--cell-pad-lg) var(--gutter);
+    }
+
+    .about-cell__name {
+      font-family: var(--font-display);
+    }
+  }
+</style>

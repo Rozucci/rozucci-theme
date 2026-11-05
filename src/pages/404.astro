@@ -1,0 +1,61 @@
+---
+/**
+ * 404 — static hosts serve one file for every missing path, so this page is
+ * bilingual on one screen: the default locale first, then the others.
+ */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import TextLink from '../components/TextLink.astro';
+import { defaultLocale, getLocaleDef, locales, localizePath, useTranslations } from '../i18n/utils';
+
+const ordered = [getLocaleDef(defaultLocale), ...locales.filter((l) => l.code !== defaultLocale)];
+---
+
+<BaseLayout locale={defaultLocale} title={useTranslations(defaultLocale).notFound.title} noindex>
+  <section class="section section--flush pad not-found">
+    <p class="t-display not-found__code"><bdi lang="en">404</bdi></p>
+    <div class="not-found__grid">
+      {
+        ordered.map((l) => {
+          const t = useTranslations(l.code);
+          const def = getLocaleDef(l.code);
+          return (
+            <div class="not-found__block" lang={def.lang} dir={def.dir}>
+              <h1 class="t-xl">{t.notFound.title}</h1>
+              <p class="u-muted">{t.notFound.text}</p>
+              <TextLink href={localizePath('/', l.code)}>{t.notFound.home}</TextLink>
+            </div>
+          );
+        })
+      }
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  @layer components {
+    .not-found {
+      display: grid;
+      gap: var(--space-2xl);
+      padding-block: var(--space-4xl);
+    }
+
+    .not-found__grid {
+      display: grid;
+      gap: var(--space-2xl);
+    }
+
+    @media (min-width: 48rem) {
+      .not-found__grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    .not-found__block {
+      display: grid;
+      align-content: start;
+      gap: var(--space-md);
+      padding-block-start: var(--space-md);
+      border-block-start: var(--line-width) solid var(--color-line);
+    }
+  }
+</style>

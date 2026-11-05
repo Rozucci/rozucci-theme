@@ -6,13 +6,15 @@
  */
 interface Props {
   label?: string;
+  /** Columns on wide screens (default: as many as fit --card-min). */
+  cols?: number;
   class?: string;
 }
 
-const { label, class: className } = Astro.props;
+const { label, cols, class: className } = Astro.props;
 ---
 
-<div class:list={['notch-row', className]}>
+<div class:list={['notch-row', { 'notch-row--cols': !!cols }, className]} style={cols ? `--nr-cols: ${cols}` : undefined}>
   <div class="notch-row__track scroll-x" role={label ? "region" : undefined} aria-label={label} tabindex={label ? 0 : undefined}>
     <slot />
   </div>
@@ -48,6 +50,10 @@ const { label, class: className } = Astro.props;
         grid-auto-flow: row;
         grid-template-columns: repeat(auto-fit, minmax(min(var(--card-min), 100%), 1fr));
         overflow: visible;
+      }
+
+      .notch-row--cols .notch-row__track {
+        grid-template-columns: repeat(var(--nr-cols), minmax(0, 1fr));
       }
     }
   }

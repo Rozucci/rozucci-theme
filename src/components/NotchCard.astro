@@ -43,6 +43,7 @@ interface Props {
   metaIsCode?: boolean;
   class?: string;
   sizes?: string;
+  [key: string]: unknown;
 }
 
 const {
@@ -61,6 +62,7 @@ const {
   metaIsCode = true,
   class: className,
   sizes = '(min-width: 64rem) 25vw, (min-width: 40rem) 45vw, 80vw',
+  ...rest
 } = Astro.props;
 
 const p = Math.min(1, Math.max(0, progress));
@@ -70,7 +72,7 @@ const style = [`--notch-progress: ${p}`, mediaRatio ? `--notch-media-ratio: ${me
 const hasMediaSlot = Astro.slots.has('media');
 ---
 
-<article class:list={['notch', className]} style={style} data-reveal="up">
+<article class:list={['notch', className]} style={style} data-reveal="up" {...rest}>
   <div class="notch__card">
     <div class="notch__media">
       {

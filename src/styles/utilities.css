@@ -64,6 +64,16 @@
     text-transform: uppercase;
   }
 
+  /*
+   * Latin islands (<bdi lang="en">) inside Persian labels: font-family is
+   * inherited as a computed value, so re-resolve the mono stack here to get
+   * the Latin-first face and tracking back.
+   */
+  .t-label :lang(en) {
+    font-family: var(--font-mono);
+    letter-spacing: var(--label-tracking);
+  }
+
   .t-mono {
     font-family: var(--font-mono);
   }

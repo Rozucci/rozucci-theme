@@ -1,0 +1,103 @@
+---
+/**
+ * CheckItem — a checklist row drawn with text signs: [ ] / [×].
+ * The native checkbox stays in the accessibility tree (visually hidden);
+ * the bracket box mirrors its state and shows the focus ring.
+ * `data-item` lets several rows with the same id stay in sync.
+ */
+interface Props {
+  id: string;
+  /** Unique DOM id suffix when the same item appears more than once. */
+  scope: string;
+  text: string;
+  meta?: string;
+  /** Milestone label, shown as an accent bracket. */
+  milestone?: string;
+}
+
+const { id, scope, text, meta, milestone } = Astro.props;
+const inputId = `${scope}-${id}`;
+---
+
+<li class="check" data-item-row={id}>
+  <input class="check__input visually-hidden" type="checkbox" id={inputId} data-item={id} />
+  <label class="check__label" for={inputId}>
+    <span class="check__box" lang="en" aria-hidden="true"></span>
+    <span class="check__text">
+      <span class="check__title">{text}</span>
+      {milestone && <span class="check__milestone t-label">[&nbsp;{milestone}&nbsp;]</span>}
+      {meta && <span class="check__meta t-label u-muted">{meta}</span>}
+    </span>
+  </label>
+</li>
+
+<style>
+  @layer components {
+    .check {
+      list-style: none;
+      border-block-end: var(--line-width) solid var(--color-line);
+    }
+
+    .check__label {
+      display: flex;
+      align-items: baseline;
+      gap: var(--space-sm);
+      padding-block: var(--space-sm);
+      cursor: pointer;
+    }
+
+    .check__box {
+      flex: none;
+      font-family: var(--font-mono);
+      font-size: var(--text-sm);
+      color: var(--color-ink-muted);
+      transition: color var(--dur-fast) var(--ease-standard);
+    }
+
+    .check__box::before {
+      content: '[\00a0]';
+      white-space: pre;
+    }
+
+    .check__input:checked + .check__label .check__box {
+      color: var(--color-ink);
+    }
+
+    .check__input:checked + .check__label .check__box::before {
+      content: '[×]';
+    }
+
+    .check__input:focus-visible + .check__label .check__box {
+      outline: var(--line-width-strong) solid var(--color-focus);
+      outline-offset: var(--line-width-strong);
+    }
+
+    .check__text {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: var(--space-2xs) var(--space-sm);
+      min-inline-size: 0;
+    }
+
+    .check__title {
+      text-decoration-line: none;
+      text-decoration-thickness: var(--line-width);
+      transition: color var(--dur-fast) var(--ease-standard);
+    }
+
+    .check__input:checked + .check__label .check__title {
+      color: var(--color-ink-muted);
+      text-decoration-line: line-through;
+    }
+
+    .check__milestone {
+      color: var(--color-accent-ink);
+      white-space: nowrap;
+    }
+
+    .check__meta {
+      white-space: nowrap;
+    }
+  }
+</style>

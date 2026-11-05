@@ -1,0 +1,712 @@
+---
+/**
+ * /orbit — the Autumn 1405 season dashboard, the theme's working example.
+ *
+ * Everything renders at build time for the build date, so the page is fully
+ * readable without JavaScript. In the browser, src/scripts/orbit.ts moves
+ * "now" to the real date, restores ticks from localStorage and keeps every
+ * counter in sync.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import CellGrid from '../../components/CellGrid.astro';
+import Label from '../../components/Label.astro';
+import SectionHead from '../../components/SectionHead.astro';
+import NotchCard from '../../components/NotchCard.astro';
+import NotchRow from '../../components/NotchRow.astro';
+import CheckItem from '../../components/CheckItem.astro';
+import type { LocaleCode } from '../../site.config';
+import {
+  code,
+  formatDate,
+  getLocaleDef,
+  localeStaticPaths,
+  num,
+  useTranslations,
+} from '../../i18n/utils';
+import { DAY_RHYTHM, PHASES, RULES, STREAMS, TARGETS, type OrbitItem } from '../../data/orbit';
+import {
+  MILESTONES,
+  PUBLICATIONS,
+  WEEKS,
+  blocksFor,
+  daysOf,
+  daysToYalda,
+  iso,
+  itemsOfWeek,
+  phaseRange,
+  progressThrough,
+  seasonProgress,
+  weekOf,
+  workday,
+} from '../../lib/orbit';
+import { ITEMS } from '../../data/orbit';
+
+export function getStaticPaths() {
+  return localeStaticPaths();
+}
+
+interface Props {
+  locale: LocaleCode;
+}
+
+const { locale } = Astro.props;
+const t = useTranslations(locale);
+const o = t.orbit;
+const lang = getLocaleDef(locale).lang;
+
+/* Build-time "now" (the browser replaces it with the real date). */
+const today = workday(new Date());
+const current = weekOf(today);
+const pct = (v: number) => num(v, locale, { style: 'percent', maximumFractionDigits: 0 });
+const date = (d: Date, opts?: Intl.DateTimeFormatOptions) => formatDate(d, locale, opts);
+const range = (a: Date, b: Date) => `${date(a)} — ${date(b)}`;
+const itemText = (i: OrbitItem) => i.t[locale];
+const milestoneLabel = (i: OrbitItem) =>
+  i.due ? date(new Date(`${i.due}T12:00:00`)) : i.tag ? i.tag[locale] : undefined;
+const phaseName = (key: string) => PHASES.find((p) => p.key === key)!.name[locale];
+const weekName = (n: number) => (n === 13 ? (locale === 'fa' ? 'یلدا' : 'Yalda') : `${o.stats.week} ${num(n, locale)}`);
+const blockLabel = (b: readonly [string, { fa: string; en: string }?]) =>
+  b[1] ? b[1][locale] : STREAMS[b[0] as keyof typeof STREAMS][locale];
+---
+
+<BaseLayout locale={locale} title={o.season} description={o.leads.phases}>
+  <div
+    class="orbit"
+    data-orbit
+    data-locale={locale}
+    data-lang={lang}
+    data-build-week={current.n}
+    data-label-week={o.stats.week}
+    data-label-yalda={locale === 'fa' ? 'یلدا' : 'Yalda'}
+    data-label-on-track={o.labels.onTrack}
+    data-label-close={o.labels.close}
+    data-label-lighten={o.labels.lighten}
+  >
+    <!-- Overview -->
+    <section class="section section--flush orbit-hero">
+      <div class="orbit-hero__main pad">
+        <Label>{o.eyebrow}</Label>
+        <h1 class="t-2xl" data-reveal="lines">{o.title}</h1>
+        <p class="t-label u-muted">
+          {o.season} · <span data-today>{date(today, { weekday: 'long', day: 'numeric', month: 'long' })}</span>
+        </p>
+      </div>
+      <div class="orbit-hero__count">
+        <span class="orbit-hero__days t-3xl" data-stat="days">{num(daysToYalda(today), locale)}</span>
+        <span class="t-label">{o.daysToYalda}</span>
+      </div>
+    </section>
+
+    <section class="section">
+      <CellGrid cols={4} colsSm={2}>
+        <div class="orbit-stat">
+          <Label>{o.stats.week}</Label>
+          <p class="orbit-stat__value"><bdi lang="en" data-stat="week-code">{current.code}</bdi></p>
+          <p class="t-label u-muted"><span data-stat="week-name">{weekName(current.n)}</span> · {o.stats.of} {num(12, locale)}</p>
+        </div>
+        <div class="orbit-stat">
+          <Label>{o.stats.phase}</Label>
+          <p class="orbit-stat__value orbit-stat__value--text" data-stat="phase">{phaseName(current.phase)}</p>
+          <p class="t-label u-muted" data-stat="phase-range">{range(phaseRange(current.phase).start, phaseRange(current.phase).end)}</p>
+        </div>
+        <div class="orbit-stat">
+          <Label>{o.stats.deliverables}</Label>
+          <p class="orbit-stat__value" data-stat="done">{num(0, locale)}</p>
+          <p class="t-label u-muted">{o.stats.of} {num(ITEMS.length, locale)}</p>
+        </div>
+        <div class="orbit-stat">
+          <Label>{o.stats.publications}</Label>
+          <p class="orbit-stat__value" data-stat="pubs">{num(0, locale)}</p>
+          <p class="t-label u-muted">{o.stats.of} {num(PUBLICATIONS.length, locale)}</p>
+        </div>
+      </CellGrid>
+      <div class="orbit-season-bar" role="img" aria-label={`${o.labels.seasonElapsed}: ${pct(seasonProgress(today))}`} data-stat-bar="season" style={`--p: ${seasonProgress(today)}`}>
+        <span></span>
+      </div>
+    </section>
+
+    <!-- (01) Phases -->
+    <section class="section" aria-labelledby="orbit-phases">
+      <SectionHead index={1} id="orbit-phases" title={o.sections.phases} lead={o.leads.phases} />
+      <NotchRow label={o.sections.phases} cols={4}>
+        {
+          PHASES.map((phase, i) => {
+            const r = phaseRange(phase.key);
+            const weeks = WEEKS.filter((w) => w.phase === phase.key);
+            return (
+              <NotchCard
+                label={`${o.stats.phase} ${num(i + 1, locale)}`}
+                meta={weeks.length > 1 ? `${weeks[0]!.code}–${weeks[weeks.length - 1]!.code}` : weeks[0]!.code}
+                title={phase.name[locale]}
+                description={phase.note[locale]}
+                href={`#phase-${phase.key}`}
+                action={t.actions.view}
+                progress={progressThrough(r.start, r.end, today)}
+                data-phase-card={phase.key}
+                data-start={iso(r.start)}
+                data-end={iso(r.end)}
+              >
+                <div slot="media" class="orbit-phase-media">
+                  <span class="t-3xl"><bdi lang="en">{code(i + 1)}</bdi></span>
+                  <span class="t-label">{range(r.start, r.end)}</span>
+                </div>
+              </NotchCard>
+            );
+          })
+        }
+      </NotchRow>
+    </section>
+
+    <!-- (02) This week -->
+    <section class="section" aria-labelledby="orbit-week">
+      <SectionHead index={2} id="orbit-week" title={o.sections.thisWeek} lead={o.leads.thisWeek}>
+        <div slot="action" class="orbit-weeknav u-js-only" role="group" aria-label={o.labels.weekNav}>
+          <button type="button" class="t-label orbit-weeknav__btn" data-week-step="-1" aria-label={o.labels.prevWeek}>
+            <span class="arrow-mirror" aria-hidden="true">←</span>
+          </button>
+          <bdi lang="en" class="t-label orbit-weeknav__code" data-week-nav-code aria-live="polite">{current.code}</bdi>
+          <button type="button" class="t-label orbit-weeknav__btn" data-week-step="1" aria-label={o.labels.nextWeek}>
+            <span class="arrow-mirror" aria-hidden="true">→</span>
+          </button>
+        </div>
+      </SectionHead>
+
+      {
+        WEEKS.map((w) => {
+          const items = itemsOfWeek(w.n);
+          return (
+            <div class="orbit-week pad" data-week-panel={w.n} hidden={w.n !== current.n}>
+              <div class="orbit-week__head">
+                <Label code tone="ink">{w.code}</Label>
+                <span class="t-label u-muted">{weekName(w.n)} · {range(w.start, w.end)} · {phaseName(w.phase)}</span>
+              </div>
+              <div class="split orbit-week__body">
+                <div>
+                  <Label as="h3" class="orbit-sub">{o.stats.deliverables}</Label>
+                  <ul role="list" class="orbit-list">
+                    {items.map((i) => (
+                      <CheckItem id={i.id} scope={`wk${w.n}`} text={itemText(i)} meta={STREAMS[i.stream][locale]} milestone={milestoneLabel(i)} />
+                    ))}
+                  </ul>
+                </div>
+                <div>
+                  <Label as="h3" class="orbit-sub">{o.sections.blocks}</Label>
+                  <div class="scroll-x">
+                    <table class="orbit-blocks">
+                      <caption class="visually-hidden">{o.sections.blocks} — {w.code}</caption>
+                      <thead>
+                        <tr>
+                          <th scope="col" class="t-label">{o.labels.time}</th>
+                          <th scope="col" class="t-label">{o.labels.block1}</th>
+                          <th scope="col" class="t-label">{o.labels.block2}</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {daysOf(w).map((d) => {
+                          const blocks = blocksFor(d);
+                          const key = iso(d);
+                          return (
+                            <tr data-day={key}>
+                              <th scope="row" class="t-label">
+                                {date(d, { weekday: 'short' })} <span class="u-muted">{date(d, { day: 'numeric', month: 'short' })}</span>
+                              </th>
+                              {blocks.length ? (
+                                blocks.map((b, bi) => (
+                                  <td>
+                                    <button type="button" class="orbit-block" data-block={`${key}:b${bi + 1}`} aria-pressed="false">
+                                      <span class="orbit-block__box" lang="en" aria-hidden="true" />
+                                      <span class="orbit-block__text">{blockLabel(b)}</span>
+                                    </button>
+                                  </td>
+                                ))
+                              ) : (
+                                <td colspan="2" class="t-label u-muted">{o.labels.floating}</td>
+                              )}
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        })
+      }
+    </section>
+
+    <!-- (03) Season map -->
+    <section class="section" aria-labelledby="orbit-season">
+      <SectionHead index={3} id="orbit-season" title={o.sections.season} lead={o.leads.season} />
+      {
+        PHASES.map((phase, pi) => {
+          const r = phaseRange(phase.key);
+          return (
+            <div class="orbit-phase" id={`phase-${phase.key}`}>
+              <div class="orbit-phase__head pad">
+                <Label index={pi + 1} tone="ink" as="h3">{phase.name[locale]}</Label>
+                <span class="t-label u-muted">{range(r.start, r.end)}</span>
+              </div>
+              {WEEKS.filter((w) => w.phase === phase.key).map((w) => {
+                const items = itemsOfWeek(w.n);
+                return (
+                  <div class="orbit-row pad" data-week-row={w.n} data-now={w.n === current.n ? '' : undefined}>
+                    <div class="orbit-row__week">
+                      <Label code tone="ink">{w.code}</Label>
+                      <span class="t-label u-muted">{range(w.start, w.end)}</span>
+                      <span class="t-label orbit-row__now">{o.labels.currentWeek}</span>
+                      <span class="t-label u-muted">
+                        <span data-week-done={w.n}>{num(0, locale)}</span> {o.stats.of} {num(items.length, locale)}
+                      </span>
+                      <span class="orbit-bar" data-week-bar={w.n} style="--p: 0"><span></span></span>
+                    </div>
+                    <ul role="list" class="orbit-list">
+                      {items.map((i) => (
+                        <CheckItem id={i.id} scope={`map${w.n}`} text={itemText(i)} meta={STREAMS[i.stream][locale]} milestone={milestoneLabel(i)} />
+                      ))}
+                    </ul>
+                  </div>
+                );
+              })}
+            </div>
+          );
+        })
+      }
+    </section>
+
+    <!-- (04) Metrics -->
+    <section class="section" aria-labelledby="orbit-metrics">
+      <SectionHead index={4} id="orbit-metrics" title={o.sections.metrics} lead={o.leads.metrics} />
+      <CellGrid cols={4} colsSm={2}>
+        <div class="orbit-stat">
+          <Label>{o.stats.deliverables}</Label>
+          <p class="orbit-stat__value" data-stat="done-pct">{pct(0)}</p>
+          <p class="t-label u-muted">{o.labels.progress}</p>
+        </div>
+        <div class="orbit-stat">
+          <Label>{o.labels.blocksThisWeek}</Label>
+          <p class="orbit-stat__value" data-stat="blocks-pct">{pct(0)}</p>
+          <p class="t-label u-muted" data-stat="blocks-status">{o.labels.target} {pct(TARGETS.blocksWeekly)}</p>
+        </div>
+        <div class="orbit-stat">
+          <Label>{o.labels.seasonElapsed}</Label>
+          <p class="orbit-stat__value" data-stat="season-pct">{pct(seasonProgress(today))}</p>
+          <p class="t-label u-muted">{o.season}</p>
+        </div>
+        <div class="orbit-stat">
+          <Label>{o.stats.publications}</Label>
+          <p class="orbit-stat__value" data-stat="pubs-2">{num(0, locale)}</p>
+          <p class="t-label u-muted">{TARGETS.audience[locale]}</p>
+        </div>
+      </CellGrid>
+
+      <div class="pad orbit-milestones">
+        <Label as="h3" class="orbit-sub">{o.labels.milestones}</Label>
+        <div class="scroll-x">
+          <table class="orbit-table">
+            <thead>
+              <tr>
+                <th scope="col" class="t-label">{o.labels.milestone}</th>
+                <th scope="col" class="t-label">{o.labels.time}</th>
+                <th scope="col" class="t-label">{o.stats.week}</th>
+                <th scope="col" class="t-label"><span class="visually-hidden">{o.labels.done}</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              {
+                MILESTONES.map((m) => (
+                  <tr data-milestone={m.id}>
+                    <td>{itemText(m)}</td>
+                    <td class="t-label u-muted">{milestoneLabel(m)}</td>
+                    <td class="t-label"><bdi lang="en">{WEEKS[m.week]!.code}</bdi></td>
+                    <td class="t-label orbit-status" data-milestone-status={m.id}>
+                      <span data-when="open">[&nbsp;{o.labels.open}&nbsp;]</span>
+                      <span data-when="done" hidden>[&nbsp;{o.labels.done}&nbsp;]</span>
+                    </td>
+                  </tr>
+                ))
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- (05) Rhythm and rules -->
+    <section class="section" aria-labelledby="orbit-rhythm">
+      <SectionHead index={5} id="orbit-rhythm" title={o.sections.rhythm} lead={o.leads.rhythm} />
+      <div class="split split--half pad orbit-rhythm">
+        <div class="scroll-x">
+          <table class="orbit-table">
+            <thead>
+              <tr>
+                <th scope="col" class="t-label">{o.labels.time}</th>
+                <th scope="col" class="t-label">{o.labels.block}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {
+                DAY_RHYTHM.map((r) => (
+                  <tr class:list={{ 'is-deep': r.deep }}>
+                    <td class="t-label"><bdi lang="en">{r.time}</bdi></td>
+                    <td>
+                      {r.t[locale]}
+                      {r.deep && <span class="t-label u-muted"> · {o.labels.deep}</span>}
+                    </td>
+                  </tr>
+                ))
+              }
+            </tbody>
+          </table>
+        </div>
+        <div>
+          <Label as="h3" class="orbit-sub">{o.sections.rules}</Label>
+          <ol role="list" class="orbit-rules">
+            {
+              RULES.map((rule, i) => (
+                <li>
+                  <span class="t-label u-muted"><bdi lang="en">({code(i + 1)})</bdi></span>
+                  <span>{rule[locale]}</span>
+                </li>
+              ))
+            }
+          </ol>
+        </div>
+      </div>
+      <div class="pad orbit-foot">
+        <p class="t-label u-muted">{o.labels.storedLocally}</p>
+        <button type="button" class="t-label orbit-reset u-js-only" data-orbit-reset>[&nbsp;{o.labels.reset}&nbsp;]</button>
+      </div>
+    </section>
+  </div>
+</BaseLayout>
+
+<style>
+  @layer components {
+    .orbit-hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    @media (min-width: 48rem) {
+      .orbit-hero {
+        grid-template-columns: minmax(0, 3fr) minmax(0, 1fr);
+      }
+    }
+
+    .orbit-hero__main {
+      display: grid;
+      gap: var(--space-md);
+      align-content: end;
+      padding-block: var(--space-3xl) var(--space-xl);
+    }
+
+    /* The single accent of this view. */
+    .orbit-hero__count {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      gap: var(--space-xs);
+      padding: var(--cell-pad-lg) var(--gutter);
+      background: var(--color-accent);
+      color: var(--color-on-accent);
+    }
+
+    .orbit-hero__days {
+      font-variant-numeric: tabular-nums;
+    }
+
+    .orbit-stat {
+      display: grid;
+      align-content: start;
+      gap: var(--space-xs);
+      padding: var(--cell-pad-lg) var(--gutter);
+    }
+
+    .orbit-stat__value {
+      font-family: var(--font-display);
+      font-size: var(--text-xl);
+      font-weight: var(--weight-display);
+      line-height: var(--leading-heading);
+    }
+
+    .orbit-stat__value--text {
+      font-size: var(--text-lg);
+    }
+
+    .orbit-season-bar,
+    .orbit-bar {
+      display: block;
+      position: relative;
+      block-size: var(--line-width-strong);
+      background: var(--color-line);
+      overflow: hidden;
+    }
+
+    .orbit-season-bar > span,
+    .orbit-bar > span {
+      position: absolute;
+      inset: 0;
+      background: var(--color-ink);
+      transform: scaleX(var(--p));
+      transform-origin: var(--origin-inline-start);
+      transition: transform var(--dur-base) var(--ease-out);
+    }
+
+    .orbit-phase-media {
+      display: grid;
+      align-content: space-between;
+      block-size: 100%;
+      padding: var(--space-md);
+      color: var(--color-notch-ink);
+    }
+
+    .orbit-weeknav {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-xs);
+    }
+
+    .orbit-weeknav__btn {
+      display: inline-grid;
+      place-items: center;
+      min-inline-size: var(--hit-target);
+      min-block-size: var(--hit-target);
+      border: var(--line-width) solid var(--color-line);
+      transition: border-color var(--dur-hover) var(--ease-standard);
+    }
+
+    .orbit-weeknav__btn:hover {
+      border-color: var(--color-ink);
+    }
+
+    .orbit-weeknav__btn:disabled {
+      color: var(--color-ink-subtle);
+      border-color: var(--color-line);
+      cursor: default;
+    }
+
+    .arrow-mirror:dir(rtl) {
+      display: inline-block;
+      transform: scaleX(-1);
+    }
+
+    .orbit-weeknav__code {
+      min-inline-size: var(--space-2xl);
+      text-align: center;
+    }
+
+    .orbit-week {
+      padding-block: var(--space-lg) var(--space-2xl);
+    }
+
+    .orbit-week__head {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-xs) var(--space-md);
+      align-items: baseline;
+      padding-block-end: var(--space-lg);
+    }
+
+    .orbit-week__body {
+      gap: var(--space-2xl);
+    }
+
+    @media (min-width: 48rem) {
+      .orbit-week__body {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    .orbit-sub {
+      display: block;
+      padding-block-end: var(--space-sm);
+      border-block-end: var(--line-width) solid var(--color-ink);
+    }
+
+    .orbit-list {
+      margin: 0;
+      padding: 0;
+    }
+
+    .orbit-blocks,
+    .orbit-table {
+      inline-size: 100%;
+    }
+
+    .orbit-blocks th,
+    .orbit-blocks td,
+    .orbit-table th,
+    .orbit-table td {
+      padding: var(--space-xs) var(--space-xs);
+      border-block-end: var(--line-width) solid var(--color-line);
+      vertical-align: baseline;
+    }
+
+    .orbit-blocks th:first-child,
+    .orbit-table th:first-child,
+    .orbit-table td:first-child {
+      padding-inline-start: 0;
+    }
+
+    .orbit-blocks thead th,
+    .orbit-table thead th {
+      color: var(--color-ink-muted);
+      font-weight: var(--weight-label);
+    }
+
+    .orbit-blocks tbody th {
+      white-space: nowrap;
+      font-weight: var(--weight-label);
+    }
+
+    .orbit-blocks tr.is-today th,
+    .orbit-blocks tr.is-today td {
+      background: var(--color-surface);
+    }
+
+    .orbit-block {
+      display: flex;
+      align-items: baseline;
+      gap: var(--space-xs);
+      inline-size: 100%;
+      min-block-size: var(--hit-target);
+      text-align: start;
+      font-size: var(--text-sm);
+      line-height: var(--leading-snug);
+    }
+
+    .orbit-block:disabled {
+      cursor: default;
+      color: var(--color-ink-muted);
+    }
+
+    .orbit-block__box {
+      flex: none;
+      font-family: var(--font-mono);
+      color: var(--color-ink-muted);
+    }
+
+    .orbit-block__box::before {
+      content: '[\00a0]';
+      white-space: pre;
+    }
+
+    .orbit-block[aria-pressed='true'] .orbit-block__box {
+      color: var(--color-ink);
+    }
+
+    .orbit-block[aria-pressed='true'] .orbit-block__box::before {
+      content: '[×]';
+    }
+
+    .orbit-phase__head {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: var(--space-sm);
+      padding-block: var(--space-lg) var(--space-sm);
+      border-block-end: var(--line-width) solid var(--color-ink);
+    }
+
+    .orbit-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--space-sm) var(--space-lg);
+      padding-block: var(--space-md);
+      border-block-end: var(--line-width) solid var(--color-line);
+    }
+
+    @media (min-width: 48rem) {
+      .orbit-row {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 3fr);
+      }
+    }
+
+    .orbit-row__week {
+      display: grid;
+      align-content: start;
+      gap: var(--space-2xs);
+    }
+
+    .orbit-row__now {
+      display: none;
+      color: var(--color-accent-ink);
+    }
+
+    .orbit-row[data-now] {
+      background: var(--color-surface);
+    }
+
+    .orbit-row[data-now] .orbit-row__now {
+      display: block;
+    }
+
+    .orbit-row .orbit-bar {
+      margin-block-start: var(--space-xs);
+      max-inline-size: var(--space-5xl);
+    }
+
+    .orbit-milestones {
+      padding-block: var(--space-2xl);
+    }
+
+    .orbit-status {
+      text-align: end;
+      white-space: nowrap;
+    }
+
+    .orbit-status [data-when='done'] {
+      color: var(--color-ink);
+    }
+
+    .orbit-rhythm {
+      padding-block: var(--space-lg) var(--space-2xl);
+      gap: var(--space-2xl);
+    }
+
+    .orbit-table tr.is-deep td {
+      background: var(--color-surface);
+    }
+
+    .orbit-rules {
+      margin: 0;
+      padding: 0;
+    }
+
+    .orbit-rules li {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      gap: var(--space-md);
+      align-items: baseline;
+      padding-block: var(--space-sm);
+      border-block-end: var(--line-width) solid var(--color-line);
+    }
+
+    .orbit-foot {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: var(--space-md);
+      padding-block: var(--space-lg);
+      border-block-start: var(--line-width) solid var(--color-line);
+    }
+
+    .orbit-reset {
+      min-block-size: var(--hit-target);
+      color: var(--color-ink-muted);
+    }
+
+    .orbit-reset:hover {
+      color: var(--color-ink);
+    }
+  }
+</style>
+
+<script>
+  import { initOrbit } from '../../scripts/orbit';
+  import { onPageLoad } from '../../scripts/lifecycle';
+  onPageLoad(initOrbit);
+</script>

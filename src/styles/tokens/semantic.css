@@ -92,6 +92,7 @@
     --card-min: var(--p-size-320); /* NotchCard minimum inline size */
     --container: var(--p-size-container);
     --measure: var(--p-size-measure);
+    --measure-display: var(--p-size-measure-narrow); /* hero statements */
     --measure-wide: var(--p-size-measure-wide);
     --header-h: var(--p-size-56);
     --hit-target: var(--p-size-44);

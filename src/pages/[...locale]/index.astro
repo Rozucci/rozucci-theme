@@ -1,7 +1,22 @@
 ---
+/**
+ * Home — hero statement with the numbered discipline index, featured work,
+ * the NotchCard practice row, the Orbit example, an about strip and contact.
+ */
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import CellGrid from '../../components/CellGrid.astro';
+import Label from '../../components/Label.astro';
+import SectionHead from '../../components/SectionHead.astro';
+import TextLink from '../../components/TextLink.astro';
+import ProjectCard from '../../components/ProjectCard.astro';
+import NotchCard from '../../components/NotchCard.astro';
+import NotchRow from '../../components/NotchRow.astro';
+import Arrow from '../../components/Arrow.astro';
 import type { LocaleCode } from '../../site.config';
-import { localeStaticPaths, useTranslations } from '../../i18n/utils';
+import { site } from '../../site.config';
+import { code, localeStaticPaths, localizePath, num, useTranslations } from '../../i18n/utils';
+import { DISCIPLINES } from '../../data/disciplines';
+import { getProjects, projectHref } from '../../lib/projects';
 
 export function getStaticPaths() {
   return localeStaticPaths();
@@ -13,11 +28,182 @@ interface Props {
 
 const { locale } = Astro.props;
 const t = useTranslations(locale);
+const projects = await getProjects(locale);
+const featured = projects.filter((p) => p.data.featured).slice(0, 3);
+const byDiscipline = (d: (typeof DISCIPLINES)[number]) => projects.filter((p) => p.data.discipline === d);
+const workHref = (d?: string) => localizePath(`/work/${d ? `?d=${d}` : ''}`, locale);
 ---
 
 <BaseLayout locale={locale}>
-  <section class="section section--flush pad pad-block">
-    <p class="t-label u-muted">{t.home.eyebrow}</p>
-    <h1 class="t-display">{t.home.statement}</h1>
+  <!-- Hero -->
+  <section class="section section--flush home-hero">
+    <div class="pad home-hero__statement">
+      <Label>{t.home.eyebrow}</Label>
+      <h1 class="t-3xl home-hero__title" data-reveal="lines">{t.home.statement}</h1>
+    </div>
+    <nav class="home-hero__index" aria-label={t.home.indexTitle}>
+      <CellGrid cols={3} colsSm={2} as="ul">
+        {
+          DISCIPLINES.map((d, i) => (
+            <li>
+              <a class="home-index__link" href={workHref(d)}>
+                <span class="t-label u-muted"><bdi lang="en">({code(i + 1)})</bdi></span>
+                <span class="home-index__name">{t.disciplines[d].name}</span>
+                <span class="t-label u-muted home-index__note">{t.disciplines[d].note}</span>
+              </a>
+            </li>
+          ))
+        }
+      </CellGrid>
+    </nav>
+  </section>
+
+  <!-- (01) Featured work -->
+  <section class="section" aria-labelledby="home-featured">
+    <SectionHead index={1} id="home-featured" title={t.home.featuredTitle}>
+      <TextLink slot="action" href={workHref()} variant="label">{t.actions.viewAll}</TextLink>
+    </SectionHead>
+    <CellGrid cols={3} as="ul">
+      {
+        featured.map((p) => (
+          <ProjectCard
+            href={projectHref(p)}
+            title={p.data.title}
+            discipline={p.data.discipline}
+            year={p.data.year}
+            index={p.data.order}
+            cover={p.data.cover}
+            coverAlt={p.data.coverAlt}
+            locale={locale}
+          />
+        ))
+      }
+    </CellGrid>
+  </section>
+
+  <!-- (02) Practice — NotchCard row -->
+  <section class="section" aria-labelledby="home-practice">
+    <SectionHead index={2} id="home-practice" title={t.home.notchTitle} />
+    <NotchRow label={t.home.notchTitle}>
+      {
+        DISCIPLINES.map((d, i) => {
+          const list = byDiscipline(d);
+          const media = list[0]?.data.media.find((m) => m.ratio === 'square')?.src;
+          return (
+            <NotchCard
+              label={t.disciplines[d].name}
+              meta={locale === 'fa' ? `${num(list.length, locale)} ${t.home.notchMeta}` : `${code(list.length)} ${t.home.notchMeta.toUpperCase()}`}
+              metaIsCode={locale !== 'fa'}
+              description={t.disciplines[d].note}
+              href={workHref(d)}
+              action={t.actions.view}
+              progress={i / (DISCIPLINES.length - 1)}
+              src={media}
+              alt=""
+            />
+          );
+        })
+      }
+    </NotchRow>
+  </section>
+
+  <!-- (03) Orbit — the theme's working example -->
+  <section class="section" aria-labelledby="home-orbit">
+    <SectionHead index={3} id="home-orbit" title={t.home.orbitTitle} lead={t.home.orbitText}>
+      <TextLink slot="action" href={localizePath('/orbit/', locale)} sign="[+]">{t.actions.open}</TextLink>
+    </SectionHead>
+  </section>
+
+  <!-- (04) About -->
+  <section class="section" aria-labelledby="home-about">
+    <SectionHead index={4} id="home-about" title={t.home.aboutTitle} lead={t.home.aboutText}>
+      <TextLink slot="action" href={localizePath('/about/', locale)} variant="label">{t.nav.about}</TextLink>
+    </SectionHead>
+  </section>
+
+  <!-- (05) Contact -->
+  <section class="section u-invert home-contact" aria-labelledby="home-contact">
+    <div class="pad home-contact__inner">
+      <span class="t-label u-muted"><bdi lang="en">(05)</bdi></span>
+      <div class="stack stack-lg">
+        <h2 id="home-contact" class="t-label u-muted">{t.home.contactTitle}</h2>
+        <p class="t-xl" data-reveal="lines">{t.home.contactText}</p>
+        <a class="home-contact__email t-2xl" href={`mailto:${site.email}`}>
+          <bdi lang="en">{site.email}</bdi>
+          <Arrow />
+        </a>
+      </div>
+    </div>
   </section>
 </BaseLayout>
+
+<style>
+  @layer components {
+    .home-hero__statement {
+      display: grid;
+      gap: var(--space-lg);
+      padding-block: var(--space-4xl) var(--space-3xl);
+    }
+
+    .home-hero__title {
+      max-inline-size: var(--measure-display);
+    }
+
+    .home-hero__index {
+      border-block-start: var(--line-width) solid var(--color-line);
+    }
+
+    .home-index__link {
+      display: grid;
+      gap: var(--space-2xs);
+      block-size: 100%;
+      padding: var(--cell-pad) var(--gutter);
+      color: inherit;
+      text-decoration: none;
+      transition: background-color var(--dur-fast) var(--ease-standard);
+    }
+
+    .home-index__link:hover {
+      background: var(--color-surface);
+    }
+
+    .home-index__link:focus-visible {
+      outline-offset: calc(-2 * var(--line-width-strong));
+    }
+
+    .home-index__name {
+      font-family: var(--font-display);
+      font-size: var(--text-lg);
+      line-height: var(--leading-snug);
+    }
+
+    .home-contact__inner {
+      display: grid;
+      gap: var(--space-lg);
+      padding-block: var(--section-space);
+    }
+
+    @media (min-width: 48rem) {
+      .home-contact__inner {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 3fr);
+      }
+    }
+
+    .home-contact__email {
+      display: inline-flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: var(--space-md);
+      font-family: var(--font-display);
+      color: inherit;
+      text-decoration: none;
+      overflow-wrap: anywhere;
+    }
+
+    .home-contact__email:hover {
+      text-decoration: underline;
+      text-decoration-thickness: var(--line-width);
+      text-underline-offset: 0.15em;
+    }
+  }
+</style>

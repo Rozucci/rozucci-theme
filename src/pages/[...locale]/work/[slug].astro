@@ -1,0 +1,40 @@
+---
+/**
+ * Project detail — one page per project per locale.
+ */
+import { render } from 'astro:content';
+import ProjectLayout from '../../../layouts/ProjectLayout.astro';
+import { locales, localeParam } from '../../../i18n/utils';
+import { getProjects, localesForSlug, projectSlug, type Project } from '../../../lib/projects';
+import type { LocaleCode } from '../../../site.config';
+
+export async function getStaticPaths() {
+  const paths = [];
+  for (const l of locales) {
+    const projects = await getProjects(l.code);
+    for (const [i, project] of projects.entries()) {
+      const next = projects[(i + 1) % projects.length]!;
+      const slug = projectSlug(project);
+      paths.push({
+        params: { locale: localeParam(l.code), slug },
+        props: { locale: l.code, project, next, alternateLocales: await localesForSlug(slug) },
+      });
+    }
+  }
+  return paths;
+}
+
+interface Props {
+  locale: LocaleCode;
+  project: Project;
+  next: Project;
+  alternateLocales: LocaleCode[];
+}
+
+const { locale, project, next, alternateLocales } = Astro.props;
+const { Content } = await render(project);
+---
+
+<ProjectLayout locale={locale} project={project} next={next} alternateLocales={alternateLocales}>
+  <Content />
+</ProjectLayout>

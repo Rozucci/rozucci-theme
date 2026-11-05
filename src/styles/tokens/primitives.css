@@ -146,6 +146,7 @@
     --p-size-256: 16rem;
     --p-size-320: 20rem;
     --p-size-measure: 62ch;
+    --p-size-measure-narrow: 16ch;
     --p-size-measure-wide: 78ch;
     --p-size-container: 90rem;
 
