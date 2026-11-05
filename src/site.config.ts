@@ -44,7 +44,9 @@ export const site = {
   email: 'hello@rozucci.ir',
 
   locales: [
-    { code: 'fa', lang: 'fa-IR', dir: 'rtl', label: 'فارسی', short: 'فا', og: 'fa_IR' },
+    // `short` is Latin on purpose: a Persian glyph in the header would make every
+    // English page download the Persian font just for two letters.
+    { code: 'fa', lang: 'fa-IR', dir: 'rtl', label: 'فارسی', short: 'FA', og: 'fa_IR' },
     { code: 'en', lang: 'en', dir: 'ltr', label: 'English', short: 'EN', og: 'en_US' },
   ] satisfies LocaleDef[],
 

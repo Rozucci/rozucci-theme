@@ -20,8 +20,10 @@ interface Props {
   /** `sizes` attribute — how wide the frame renders at each breakpoint. */
   sizes?: string;
   widths?: number[];
-  /** Above the fold: load eagerly with high fetch priority (LCP image). */
+  /** The LCP image: eager + high fetch priority, and never hidden by a reveal. */
   priority?: boolean;
+  /** Load eagerly without raising priority (near the fold, not the LCP). */
+  eager?: boolean;
   caption?: string;
   reveal?: boolean;
   parallax?: boolean;
@@ -35,8 +37,9 @@ const {
   sizes = '(min-width: 64rem) 50vw, 100vw',
   widths = [480, 800, 1200, 1600],
   priority = false,
+  eager = false,
   caption,
-  reveal = true,
+  reveal = !priority,
   parallax = false,
   class: className,
 } = Astro.props;
@@ -60,7 +63,7 @@ const usableWidths = src ? widths.filter((w) => w <= src.width) : widths;
             fallbackFormat="jpg"
             widths={usableWidths.length ? usableWidths : [src.width]}
             sizes={sizes}
-            loading={priority ? 'eager' : 'lazy'}
+            loading={priority || eager ? 'eager' : 'lazy'}
             decoding={priority ? 'sync' : 'async'}
             fetchpriority={priority ? 'high' : 'auto'}
             class="media__img"

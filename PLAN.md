@@ -37,12 +37,13 @@ NotchCard, Label, hairline tables and the motion layer.
 | Phase | Scope | Status |
 | --- | --- | --- |
 | 0 | `PLAN.md`, `CLAUDE.md` | done |
-| 1 | Scaffold, tokens, themes, fonts, base styles, `/styleguide` skeleton | — |
-| 2 | Layout grid + components (CellGrid, NotchCard, …) | — |
-| 3 | Pages, content collections, i18n, Orbit dashboard | — |
-| 4 | Motion layer (GSAP, Lenis, view transitions) | — |
-| 5 | QA + `README.md` guides | — |
-| 6 | GitHub Actions → GitHub Pages | — |
+| 1 | Scaffold, tokens, themes, fonts, base styles, `/styleguide` skeleton | done |
+| 2 | Layout grid + components (CellGrid, NotchCard, …) | done |
+| 3 | Pages, content collections, i18n, Orbit dashboard | done |
+| 3b | Five more themes + customisation knobs + store kit (from Shayan's references) | done |
+| 4 | Motion layer (GSAP, Lenis, view transitions) | done |
+| 5 | QA + `README.md` guides | done |
+| 6 | GitHub Actions → GitHub Pages | done |
 
 ## Assumptions
 
@@ -132,7 +133,34 @@ NotchCard, Label, hairline tables and the motion layer.
     for sub-path hosts (GitHub Pages project sites). All internal links go
     through one helper, so the base is respected everywhere.
 
+### Added after the first brief
+
+23. **Reference-driven themes.** Shayan shared five reference screens (a
+    product page, an onboarding card grid, a catalog, a studio site, a
+    fragrance product page). Only their *principles* were used, as five
+    generic themes — `stone`, `sand`, `paper`, `studio`, `sage` — plus
+    structural knobs in the token layer (boxed page, boxed grid, display
+    face/case, emphasis, media filter, button style). No names, logos, copy or
+    assets from those sites.
+24. **Store kit** (demo): products collection, catalog, product page,
+    browser-only cart. Checkout is deliberately not connected. Placeholder
+    products follow the disciplines: prints, an original, LUTs, an album, a
+    template, a zine.
+25. Font roles are composed per language from `*-latin` pieces so a theme can
+    change faces without breaking Persian (Vazirmatn always first in `fa`).
+26. Performance: all CSS is inlined (no render-blocking requests), the
+    Persian font is subset to the Arabic block, labels are 12px minimum, the
+    language switcher shows Latin `FA` / `EN` (a Persian glyph would load the
+    Persian font on every English page), Orbit's non-current weeks live in
+    inert `<template>`s.
+27. Preview deploys set `PUBLIC_NOINDEX=true` → every page gets `noindex`.
+28. The repository had no commits and no `main` branch at the start, so the
+    work lives on the session branch; a pull request needs a base branch.
+
 ## Open decisions (for Shayan)
+
+- What the shop will really sell (the demo assumes prints, originals, presets,
+  sound, templates) and in which currency (`site.config → store`).
 
 - Should `/orbit` stay a showcase page, or become a private tool (noindex,
   removed from the nav) once the real portfolio content arrives?

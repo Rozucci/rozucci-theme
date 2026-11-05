@@ -65,7 +65,7 @@
     --em-style: italic; /* <em> inside headlines */
     --em-color: inherit;
 
-    --text-2xs: var(--p-size-11); /* mono labels */
+    --text-2xs: var(--p-size-12); /* mono labels (12px: legible minimum) */
     --text-xs: var(--p-size-12);
     --text-sm: var(--p-size-14);
     --text-base: var(--p-size-17);

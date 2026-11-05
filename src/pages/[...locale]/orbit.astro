@@ -174,8 +174,8 @@ const blockLabel = (b: readonly [string, { fa: string; en: string }?]) =>
       {
         WEEKS.map((w) => {
           const items = itemsOfWeek(w.n);
-          return (
-            <div class="orbit-week pad" data-week-panel={w.n} hidden={w.n !== current.n}>
+          const panel = (
+            <div class="orbit-week pad" data-week-panel={w.n}>
               <div class="orbit-week__head">
                 <Label code tone="ink">{w.code}</Label>
                 <span class="t-label u-muted">{weekName(w.n)} · {range(w.start, w.end)} · {phaseName(w.phase)}</span>
@@ -232,6 +232,9 @@ const blockLabel = (b: readonly [string, { fa: string; en: string }?]) =>
               </div>
             </div>
           );
+          /* Only the current week is in the DOM; the others wait in inert
+             <template>s (smaller DOM, faster first render) until opened. */
+          return w.n === current.n ? panel : <template data-week-template={w.n}>{panel}</template>;
         })
       }
     </section>

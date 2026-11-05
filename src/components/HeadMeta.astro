@@ -24,7 +24,10 @@ interface Props {
   alternateLocales?: LocaleCode[];
 }
 
-const { locale, title, description, noindex = false, alternateLocales } = Astro.props;
+const { locale, title, description, noindex: pageNoindex = false, alternateLocales } = Astro.props;
+/* Preview builds (e.g. GitHub Pages) set PUBLIC_NOINDEX=true so they never
+   compete with the real domain in search results. */
+const noindex = pageNoindex || import.meta.env.PUBLIC_NOINDEX === 'true';
 const t = useTranslations(locale);
 const def = getLocaleDef(locale);
 const fullTitle = title ? `${title}${t.meta.titleSeparator}${site.name}` : site.name;

@@ -15,8 +15,9 @@ export default defineConfig({
   trailingSlash: 'always',
   build: {
     format: 'directory',
-    // Small page-specific CSS is inlined to save requests on first paint.
-    inlineStylesheets: 'auto',
+    // All CSS is inlined: no render-blocking stylesheet requests (the whole
+    // theme is ~9 KB gzip), which keeps first paint and LCP fast on mobile.
+    inlineStylesheets: 'always',
   },
   prefetch: {
     prefetchAll: false,

@@ -14,6 +14,7 @@
     "build": "astro build",
     "preview": "astro preview",
     "fonts": "node scripts/copy-fonts.mjs",
+    "fonts:subset": "python3 scripts/subset-fa.py",
     "placeholders": "node scripts/gen-placeholders.mjs",
     "astro": "astro"
   },

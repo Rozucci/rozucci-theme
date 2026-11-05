@@ -44,6 +44,13 @@ Le Labo. Never copy any brand's logo, name, fonts, illustrations or copy.
   components: `0`, `1`, `100%`, `auto`, `none`, `inherit`, `currentColor`.
   Need a new value? Add a primitive, then a semantic role, then use the role.
 - Colours: each role is one `light-dark(light, dark)` line in the theme file.
+- Themes may also flip the structural knobs in `semantic.css` (frame inset,
+  boxed grid, `*-latin` font pieces, display/label transform, `<em>` style,
+  media filter, button tokens). Override the `*-latin` pieces, never the
+  composed `--font-display/-text/-mono` (those are rebuilt per language).
+- Allowed literals outside tokens: media/container-query breakpoints (CSS
+  cannot read variables there), mask alpha keywords (`black`/`transparent`),
+  and the cursor label's physical `inset` (pointer coordinates are physical).
 - Motion values (durations, easings) are CSS tokens; JS reads them through
   `src/motion/config.ts`. Never hardcode a duration or ease in JS.
 - `src/site.config.ts` is the single config: name, locales, default locale,
@@ -68,7 +75,11 @@ Le Labo. Never copy any brand's logo, name, fonts, illustrations or copy.
 - Pages live in `src/pages/[...locale]/` and render both locales from one
   file. Projects are paired across locales by identical file names.
 - UI strings only from `src/i18n/{fa,en}.ts` (typed — `en` defines the shape).
-  No inline UI copy in components.
+  No inline UI copy in components (the English-only /styleguide is the one
+  exception).
+- Never use logical margins on a `<bdi>` (it resolves them in its own
+  direction) — use `gap` on the parent instead. Do not put `lang="fa"` on
+  Latin text (it switches the element to the Persian font stack).
 - Persian prose shows Persian digits via `num()`; codes, indices `(01)`,
   prices and routes stay Latin via `code()`.
 - Wrap Latin runs inside Persian text with `<bdi>`.
@@ -90,6 +101,13 @@ Le Labo. Never copy any brand's logo, name, fonts, illustrations or copy.
 - SplitText: lines (or words) only, never chars for `fa`.
 - No scroll-jacking, no pinned horizontal sections in v1.
 
+## Store kit
+
+- Products live in `src/content/products/{fa,en}/`; prices are numbers in
+  `site.store.currency`, always rendered Latin via `formatPrice()`.
+- The cart is browser-only (`src/scripts/cart.ts`); checkout stays disabled
+  until a real backend is chosen. Never fabricate reviews or ratings.
+
 ## Quality bar
 
 - `npm run check` (astro check) and `npm run build`: zero errors, zero warnings
@@ -108,6 +126,7 @@ npm run check         # astro check (types + .astro diagnostics)
 npm run build         # static build into dist/
 npm run preview       # serve dist/
 npm run fonts         # copy self-hosted fonts from node_modules → public/fonts
+npm run fonts:subset  # subset the Persian font (needs: pip install fonttools brotli)
 npm run placeholders  # regenerate placeholder media
 ```
 

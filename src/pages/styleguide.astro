@@ -909,7 +909,7 @@ const themeNotes: Record<string, string> = {
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (state) state.textContent = reduce ? 'reduced motion: demos are static' : '';
     const splits = [...root.querySelectorAll<HTMLElement>('[data-demo="lines"]')].map((el) =>
-      SplitText.create(el, { type: 'lines', mask: 'lines', linesClass: 'rz-line' }),
+      SplitText.create(el, { type: 'lines', mask: 'lines', linesClass: 'rz-line', aria: 'none' }),
     );
 
     const play = () => {

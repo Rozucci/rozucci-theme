@@ -30,7 +30,7 @@ const targets = otherLocales(locale).map((l) => ({
           class="lang-switch__link t-label"
           href={l.href}
           hreflang={l.lang}
-          lang={l.lang}
+          lang={long ? l.lang : undefined}
           aria-label={l.label}
           data-lang-switch
         >

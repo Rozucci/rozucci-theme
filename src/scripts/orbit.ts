@@ -115,8 +115,21 @@ export function initOrbit(): void {
   });
 
   /* ---------------- week navigator ---------------- */
+  /** Materialise a week panel from its <template> the first time it is shown. */
+  const ensurePanel = (n: number) => {
+    if ($(`[data-week-panel="${n}"]`)) return;
+    const tpl = $<HTMLTemplateElement>(`template[data-week-template="${n}"]`);
+    const node = tpl?.content.firstElementChild?.cloneNode(true);
+    if (tpl && node) {
+      tpl.replaceWith(node);
+      syncItems();
+      syncBlocks();
+    }
+  };
+
   const showWeek = (n: number) => {
     shown = Math.max(0, Math.min(WEEKS.length - 1, n));
+    ensurePanel(shown);
     $$('[data-week-panel]').forEach((panel) => {
       panel.hidden = Number(panel.dataset.weekPanel) !== shown;
     });

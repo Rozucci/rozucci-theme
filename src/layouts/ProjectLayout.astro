@@ -61,7 +61,7 @@ const [hero, ...sequence] = p.media;
     {
       hero && (
         <div class="section pad project__hero">
-          <MediaFrame src={hero.src} alt={hero.alt} ratio={hero.ratio} caption={hero.caption} priority sizes="(min-width: 90rem) 1400px, 100vw" widths={[640, 960, 1280, 1600, 2400]} parallax />
+          <MediaFrame src={hero.src} alt={hero.alt} ratio={hero.ratio} caption={hero.caption} eager sizes="(min-width: 90rem) 1400px, 100vw" widths={[640, 960, 1280, 1600, 2400]} parallax />
         </div>
       )
     }

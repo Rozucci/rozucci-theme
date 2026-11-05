@@ -17,7 +17,9 @@ export function revealLines(el: HTMLElement): void {
     mask: 'lines',
     linesClass: 'rz-line',
     autoSplit: true,
-    aria: 'auto',
+    // Lines keep the text in reading order, so no aria-label is needed (and
+    // aria-label is not allowed on a plain <p>).
+    aria: 'none',
     onSplit(self: SplitText) {
       gsap.set(el, { visibility: 'visible' });
       return gsap.from(self.lines, {

@@ -115,7 +115,9 @@ for (const p of products) {
 
 <style>
   @layer components {
+    /* Reserve room: rows arrive after JS, the footer must not jump (CLS). */
     .cart {
+      min-block-size: calc(3 * var(--space-5xl));
       padding-block: var(--space-lg) var(--space-3xl);
     }
 
