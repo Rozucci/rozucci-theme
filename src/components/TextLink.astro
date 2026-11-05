@@ -1,0 +1,91 @@
+---
+/**
+ * TextLink — navigation by text signs instead of icons.
+ *
+ *   <TextLink href="/work/">All work</TextLink>            → All work →
+ *   <TextLink href="…" sign="[+]">View</TextLink>          → [+] VIEW
+ *   <TextLink href="…" arrow="back">Back</TextLink>        → ← Back
+ *   <TextLink href="…" variant="label">Index</TextLink>    → mono, uppercase
+ *
+ * Arrows mirror in RTL. External links get rel/target and an accessible note.
+ */
+import Arrow from './Arrow.astro';
+
+interface Props {
+  href: string;
+  sign?: string;
+  arrow?: 'forward' | 'back' | 'up' | 'down' | false;
+  variant?: 'label' | 'text';
+  external?: boolean;
+  externalNote?: string;
+  current?: boolean;
+  class?: string;
+  [key: string]: unknown;
+}
+
+const {
+  href,
+  sign,
+  arrow = sign ? false : 'forward',
+  variant = sign ? 'label' : 'text',
+  external = /^https?:\/\//.test(href),
+  externalNote,
+  current = false,
+  class: className,
+  ...rest
+} = Astro.props;
+
+const arrowFirst = arrow === 'back' || arrow === 'up';
+---
+
+<a
+  href={href}
+  class:list={['text-link', `text-link--${variant}`, { 't-label': variant === 'label' }, className]}
+  target={external ? '_blank' : undefined}
+  rel={external ? 'noopener noreferrer' : undefined}
+  aria-current={current ? 'page' : undefined}
+  {...rest}
+>
+  {sign && <bdi lang="en" class="text-link__sign" aria-hidden="true">{sign}</bdi>}
+  {arrow && arrowFirst && <Arrow direction={arrow} class="text-link__arrow" />}
+  <span class="text-link__text"><slot /></span>
+  {arrow && !arrowFirst && <Arrow direction={arrow} class="text-link__arrow" />}
+  {external && externalNote && <span class="visually-hidden">({externalNote})</span>}
+</a>
+
+<style>
+  @layer components {
+    .text-link {
+      display: inline-flex;
+      align-items: baseline;
+      gap: var(--space-xs);
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .text-link__text {
+      text-decoration-line: underline;
+      text-decoration-thickness: var(--line-width);
+      text-underline-offset: 0.25em;
+      text-decoration-color: var(--color-line-strong);
+      transition: text-decoration-color var(--dur-hover) var(--ease-standard);
+    }
+
+    .text-link--label .text-link__text {
+      text-decoration-color: transparent;
+    }
+
+    .text-link:hover .text-link__text,
+    .text-link[aria-current='page'] .text-link__text {
+      text-decoration-color: currentColor;
+    }
+
+    .text-link:hover :global(.text-link__arrow) {
+      translate: calc(var(--dir-sign) * var(--space-2xs)) 0;
+    }
+
+    .text-link__sign {
+      font-family: var(--font-mono);
+    }
+  }
+</style>

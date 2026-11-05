@@ -39,7 +39,8 @@
 
     /* -------- Type -------- */
     --font-fa: var(--p-font-vazirmatn), var(--p-font-system-sans);
-    --font-display: var(--p-font-brand), var(--p-font-vazirmatn), var(--p-font-system-serif);
+    --font-brand: var(--p-font-brand), var(--p-font-system-serif); /* wordmark */
+    --font-display: var(--p-font-instrument), var(--p-font-vazirmatn), var(--p-font-system-serif);
     --font-text: var(--p-font-inter), var(--p-font-vazirmatn), var(--p-font-system-sans);
     --font-mono: var(--p-font-roboto-mono), var(--p-font-vazirmatn), var(--p-font-system-mono);
 
@@ -53,6 +54,7 @@
     --text-2xl: var(--p-size-fluid-40-72);
     --text-3xl: var(--p-size-fluid-48-120);
     --text-display: var(--p-size-fluid-56-168);
+    --text-wordmark: var(--p-size-wordmark);
 
     --leading-display: var(--p-leading-0-95);
     --leading-heading: var(--p-leading-1-1);
@@ -86,6 +88,8 @@
     --section-space: var(--p-space-fluid-64-160);
     --cell-pad: var(--p-space-16);
     --cell-pad-lg: var(--p-space-24);
+    --cell-min: var(--p-size-256); /* CellGrid auto-fill minimum */
+    --card-min: var(--p-size-320); /* NotchCard minimum inline size */
     --container: var(--p-size-container);
     --measure: var(--p-size-measure);
     --measure-wide: var(--p-size-measure-wide);
@@ -107,8 +111,8 @@
     --ratio-cinema: var(--p-ratio-21-9);
 
     /* -------- NotchCard -------- */
-    --notch-w: var(--p-size-28); /* pill length; half of it cuts into the card */
-    --notch-h: var(--p-size-10); /* pill thickness */
+    --notch-w: var(--p-size-36); /* pill length; half of it cuts into the card */
+    --notch-h: var(--p-size-12); /* pill thickness */
     --notch-gap: var(--p-space-12); /* distance from media bottom to notch centre */
     --notch-card-pad: var(--p-space-12);
     --notch-media-ratio: 1; /* media height ÷ media width (1 = square) */
@@ -173,7 +177,7 @@
    * Letter-spacing is removed — tracking breaks Arabic-script joining.
    */
   :lang(fa) {
-    --font-display: var(--p-font-vazirmatn), var(--p-font-brand), var(--p-font-system-sans);
+    --font-display: var(--p-font-vazirmatn), var(--p-font-instrument), var(--p-font-system-sans);
     --font-text: var(--p-font-vazirmatn), var(--p-font-inter), var(--p-font-system-sans);
     /* Persian labels set in Vazirmatn (mono spaces are too wide between
        Persian words). Codes inside them use <bdi lang="en"> → mono again. */
@@ -189,7 +193,7 @@
 
   /* Latin islands inside Persian pages get their Latin faces back. */
   :lang(en) {
-    --font-display: var(--p-font-brand), var(--p-font-vazirmatn), var(--p-font-system-serif);
+    --font-display: var(--p-font-instrument), var(--p-font-vazirmatn), var(--p-font-system-serif);
     --font-text: var(--p-font-inter), var(--p-font-vazirmatn), var(--p-font-system-sans);
     --font-mono: var(--p-font-roboto-mono), var(--p-font-vazirmatn), var(--p-font-system-mono);
     --weight-display: var(--p-weight-400);

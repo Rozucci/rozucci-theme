@@ -1,0 +1,150 @@
+---
+/**
+ * CellGrid — the collapsed, visible grid. Build every grid of cells with it.
+ *
+ * Each direct child is a cell. Cells draw their own block-end and inline-end
+ * hairlines with ::before / ::after; the grid is pulled out by one line width
+ * on its end sides and clipped by the wrapper, so the outermost lines vanish
+ * and no line is ever drawn twice — even when the last row is incomplete.
+ * `frame` adds an outer border on the wrapper.
+ *
+ * Because the lines are pseudo-elements, they can "draw in" with a transform
+ * (the motion layer animates --cg-draw on the wrapper). Direct children must
+ * therefore not use ::before / ::after on their root element. The wrapper
+ * clips overflow, so interactive cells use an inset focus ring.
+ *
+ * Props:
+ *   cols   — fixed column count from the `md` breakpoint up (default: auto-fill)
+ *   colsSm — column count on narrow screens (default 1)
+ *   min    — minimum cell inline size for auto-fill, e.g. "16rem"
+ *   frame  — draw the outer frame
+ *   as     — wrapper element (div | ul | ol | section)
+ */
+interface Props {
+  cols?: number;
+  colsSm?: number;
+  min?: string;
+  frame?: boolean;
+  as?: 'div' | 'ul' | 'ol' | 'section' | 'dl';
+  class?: string;
+  [key: string]: unknown;
+}
+
+const {
+  cols,
+  colsSm = 1,
+  min,
+  frame = false,
+  as: Tag = 'div',
+  class: className,
+  ...rest
+} = Astro.props;
+
+const style = [
+  cols ? `--cg-cols: ${cols}` : '',
+  cols ? `--cg-cols-md: ${Math.min(cols, Math.max(colsSm, 2))}` : '',
+  `--cg-cols-sm: ${colsSm}`,
+  min ? `--cg-min: ${min}` : '',
+]
+  .filter(Boolean)
+  .join('; ');
+const isList = Tag === 'ul' || Tag === 'ol';
+---
+
+<div
+  class:list={['cell-grid', { 'cell-grid--frame': frame }, className]}
+  data-cell-grid
+  style={style}
+>
+  <Tag
+    class:list={['cell-grid__cells', { 'cell-grid__cells--fixed': !!cols }]}
+    role={isList ? 'list' : undefined}
+    {...rest}
+  >
+    <slot />
+  </Tag>
+</div>
+
+<style>
+  @layer components {
+    .cell-grid {
+      --cg-draw: 1;
+      container-type: inline-size;
+      overflow: clip;
+    }
+
+    .cell-grid--frame {
+      border: var(--line-width) solid var(--color-line);
+    }
+
+    .cell-grid__cells {
+      display: grid;
+      grid-template-columns: repeat(
+        auto-fill,
+        minmax(min(var(--cg-min, var(--cell-min)), 100%), 1fr)
+      );
+      margin-inline-end: calc(-1 * var(--line-width));
+      margin-block-end: calc(-1 * var(--line-width));
+      padding: 0;
+      list-style: none;
+    }
+
+    .cell-grid__cells--fixed {
+      grid-template-columns: repeat(var(--cg-cols-sm), minmax(0, 1fr));
+    }
+
+    @container (min-width: 40rem) {
+      .cell-grid__cells--fixed {
+        grid-template-columns: repeat(var(--cg-cols-md), minmax(0, 1fr));
+      }
+    }
+
+    @container (min-width: 64rem) {
+      .cell-grid__cells--fixed {
+        grid-template-columns: repeat(var(--cg-cols), minmax(0, 1fr));
+      }
+    }
+
+    .cell-grid__cells > :global(*) {
+      position: relative;
+      min-inline-size: 0;
+    }
+
+    /* block-end hairline */
+    .cell-grid__cells > :global(*)::before {
+      content: '';
+      position: absolute;
+      inset-inline: 0;
+      inset-block-end: 0;
+      block-size: var(--line-width);
+      background: var(--color-line);
+      transform: scaleX(var(--cg-draw));
+      transform-origin: var(--origin-inline-start);
+      pointer-events: none;
+    }
+
+    /* inline-end hairline */
+    .cell-grid__cells > :global(*)::after {
+      content: '';
+      position: absolute;
+      inset-block: 0;
+      inset-inline-end: 0;
+      inline-size: var(--line-width);
+      background: var(--color-line);
+      transform: scaleY(var(--cg-draw));
+      transform-origin: top;
+      pointer-events: none;
+    }
+
+    /* Spanning helpers for children: class="span-2" / "span-full" */
+    .cell-grid__cells > :global(.span-full) {
+      grid-column: 1 / -1;
+    }
+
+    @container (min-width: 40rem) {
+      .cell-grid__cells > :global(.span-2) {
+        grid-column: span 2;
+      }
+    }
+  }
+</style>

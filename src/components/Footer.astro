@@ -1,9 +1,102 @@
 ---
+/**
+ * Footer — a CellGrid of contact, index, elsewhere and colophon cells, closed
+ * by a full-width wordmark.
+ */
+import CellGrid from './CellGrid.astro';
+import Label from './Label.astro';
+import TextLink from './TextLink.astro';
 import type { LocaleCode } from '../site.config';
 import { site } from '../site.config';
-import { useTranslations } from '../i18n/utils';
-interface Props { locale: LocaleCode }
+import { localizePath, useTranslations, year } from '../i18n/utils';
+
+interface Props {
+  locale: LocaleCode;
+}
+
 const { locale } = Astro.props;
 const t = useTranslations(locale);
+const buildYear = new Date().getFullYear();
 ---
-<footer class="section pad"><p class="t-label">© {site.name} — {t.footer.rights}</p></footer>
+
+<footer class="site-footer section">
+  <CellGrid cols={4} colsSm={1}>
+    <div class="site-footer__cell">
+      <Label as="h2">{t.footer.contactLabel}</Label>
+      <a class="site-footer__email" href={`mailto:${site.email}`}><bdi lang="en">{site.email}</bdi></a>
+    </div>
+    <nav class="site-footer__cell" aria-label={t.a11y.footerNav}>
+      <Label as="h2">{t.footer.indexLabel}</Label>
+      <ul role="list" class="stack stack-sm">
+        <li><TextLink href={localizePath('/', locale)} arrow={false}>{t.nav.home}</TextLink></li>
+        {
+          site.nav.map((item) => (
+            <li>
+              <TextLink href={localizePath(item.href, locale)} arrow={false}>
+                {t.nav[item.key]}
+              </TextLink>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+    <div class="site-footer__cell">
+      <Label as="h2">{t.footer.elsewhereLabel}</Label>
+      <ul role="list" class="stack stack-sm">
+        {
+          site.socials.map((s) => (
+            <li>
+              <TextLink href={s.href} externalNote={t.a11y.opensInNewTab}>
+                <bdi lang="en">{s.label}</bdi>
+              </TextLink>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+    <div class="site-footer__cell site-footer__colophon">
+      <p class="t-label u-muted">© {year(buildYear, locale)} <bdi lang="en">{site.name}</bdi>. {t.footer.rights}</p>
+      <p class="t-label u-muted">{t.footer.colophon}</p>
+      <TextLink href="#main" arrow="up" variant="label" class="site-footer__top">{t.actions.backToTop}</TextLink>
+    </div>
+  </CellGrid>
+  <p class="site-footer__mark" aria-hidden="true"><bdi lang="en">{site.name}</bdi></p>
+</footer>
+
+<style>
+  @layer components {
+    .site-footer {
+      container-type: inline-size;
+      margin-block-start: var(--section-space);
+    }
+
+    .site-footer__cell {
+      display: grid;
+      align-content: start;
+      gap: var(--space-md);
+      padding: var(--cell-pad-lg) var(--gutter);
+      min-block-size: var(--space-5xl);
+    }
+
+    .site-footer__email {
+      font-size: var(--text-md);
+      overflow-wrap: anywhere;
+    }
+
+    .site-footer__colophon {
+      align-content: space-between;
+    }
+
+    .site-footer__mark {
+      font-family: var(--font-brand);
+      font-size: var(--text-wordmark);
+      line-height: var(--leading-display);
+      letter-spacing: var(--tracking-display);
+      text-align: center;
+      padding-block: var(--space-lg) var(--space-md);
+      border-block-start: var(--line-width) solid var(--color-line);
+      overflow: hidden;
+      user-select: none;
+    }
+  }
+</style>

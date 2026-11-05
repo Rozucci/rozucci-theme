@@ -9,6 +9,23 @@
  * This page is a developer tool: its copy is English and inline by design.
  */
 import BaseLayout from '../layouts/BaseLayout.astro';
+import CellGrid from '../components/CellGrid.astro';
+import Label from '../components/Label.astro';
+import TextLink from '../components/TextLink.astro';
+import SectionHead from '../components/SectionHead.astro';
+import MediaFrame from '../components/MediaFrame.astro';
+import ProjectCard from '../components/ProjectCard.astro';
+import NotchCard from '../components/NotchCard.astro';
+import NotchRow from '../components/NotchRow.astro';
+import LanguageSwitcher from '../components/LanguageSwitcher.astro';
+import ThemeToggle from '../components/ThemeToggle.astro';
+import Arrow from '../components/Arrow.astro';
+import cover1 from '../assets/placeholders/orbit-field-cover.png';
+import cover2 from '../assets/placeholders/index-of-nights-cover.png';
+import cover3 from '../assets/placeholders/event-horizon-cover.png';
+import wide1 from '../assets/placeholders/frame-arrives-wide.png';
+import detail1 from '../assets/placeholders/low-frequency-detail.png';
+import detail2 from '../assets/placeholders/second-mind-detail.png';
 import semanticCss from '../styles/tokens/semantic.css?raw';
 import ivoryCss from '../styles/themes/ivory.css?raw';
 import { site } from '../site.config';
@@ -37,6 +54,10 @@ const sections = [
   { id: 'space', title: 'Space' },
   { id: 'shape', title: 'Lines, radius, ratios' },
   { id: 'motion-tokens', title: 'Motion tokens' },
+  { id: 'accent', title: 'Accent proof' },
+  { id: 'grid', title: 'CellGrid' },
+  { id: 'components', title: 'Components' },
+  { id: 'notch', title: 'NotchCard' },
 ];
 ---
 
@@ -242,6 +263,142 @@ const sections = [
         </ul>
       </section>
 
+
+      <section class="section" id="accent" aria-labelledby="accent-title">
+        <header class="pad sg-section-head">
+          <span class="t-label u-muted">{indexSign(6)}</span>
+          <h2 id="accent-title" class="t-xl">Accent proof</h2>
+        </header>
+        <div class="pad sg-accent">
+          <p class="measure">
+            Every element below reads <code>--color-accent</code> (or its text-safe pair
+            <code>--color-accent-ink</code>). Pick a colour to preview it site-wide for this page
+            view. To make it permanent, change the <code>--color-accent</code> line in
+            <code>src/styles/themes/ivory.css</code> — one line, every page.
+          </p>
+          <div class="cluster">
+            <label class="t-label sg-picker">
+              <span>Preview --color-accent</span>
+              <input type="color" value="#d97757" data-accent-picker />
+            </label>
+            <button type="button" class="t-label sg-btn" data-accent-reset>[ reset ]</button>
+          </div>
+          <CellGrid cols={4} colsSm={2} frame>
+            <div class="pad-cell stack stack-sm">
+              <Label>Fill</Label>
+              <span class="sg-accent-fill" />
+            </div>
+            <div class="pad-cell stack stack-sm">
+              <Label>Text (accent-ink)</Label>
+              <span class="u-accent t-lg">Accent text</span>
+            </div>
+            <div class="pad-cell stack stack-sm">
+              <Label>Focus ring</Label>
+              <button type="button" class="t-label sg-btn sg-focus-demo">[ focused ]</button>
+            </div>
+            <div class="pad-cell stack stack-sm">
+              <Label>Checkbox / form accent</Label>
+              <label class="cluster t-label"><input type="checkbox" checked class="sg-accent-check" /> done</label>
+            </div>
+          </CellGrid>
+        </div>
+      </section>
+
+      <section class="section" id="grid" aria-labelledby="grid-title">
+        <header class="pad sg-section-head">
+          <span class="t-label u-muted">{indexSign(7)}</span>
+          <h2 id="grid-title" class="t-xl">CellGrid</h2>
+        </header>
+        <div class="pad stack stack-lg sg-demo">
+          <p class="measure u-muted">
+            Collapsed lines, never doubled — including an incomplete last row. Fixed columns
+            (4 → 2 → 1) and auto-fill.
+          </p>
+          <CellGrid cols={4} frame>
+            {Array.from({ length: 7 }, (_, i) => (
+              <div class="pad-cell sg-cell">
+                <Label index={i + 1}>Cell</Label>
+              </div>
+            ))}
+          </CellGrid>
+          <CellGrid min="12rem">
+            {Array.from({ length: 5 }, (_, i) => (
+              <div class="pad-cell sg-cell">
+                <Label>auto-fill · {i + 1}</Label>
+              </div>
+            ))}
+          </CellGrid>
+        </div>
+      </section>
+
+      <section class="section" id="components" aria-labelledby="components-title">
+        <header class="pad sg-section-head">
+          <span class="t-label u-muted">{indexSign(8)}</span>
+          <h2 id="components-title" class="t-xl">Components</h2>
+        </header>
+        <CellGrid cols={3}>
+          <div class="pad-cell stack">
+            <Label tone="ink">Label</Label>
+            <Label>Muted label</Label>
+            <Label bracket tone="ink">Bracket</Label>
+            <Label index={3} tone="ink">Indexed</Label>
+            <Label code tone="accent">W07 · 02:40</Label>
+          </div>
+          <div class="pad-cell stack">
+            <Label tone="ink">TextLink</Label>
+            <TextLink href="#components">All work</TextLink>
+            <TextLink href="#components" arrow="back">Back</TextLink>
+            <TextLink href="#components" sign="[+]">Add to cart</TextLink>
+            <TextLink href="#components" variant="label" arrow={false}>/work</TextLink>
+            <TextLink href="https://example.com" externalNote="opens in a new tab">External</TextLink>
+          </div>
+          <div class="pad-cell stack">
+            <Label tone="ink">Header tools</Label>
+            <LanguageSwitcher locale="en" long />
+            <ThemeToggle locale="en" />
+            <p class="t-label u-muted">Arrows mirror in RTL: <Arrow /> <Arrow direction="back" /></p>
+          </div>
+        </CellGrid>
+        <div class="section">
+          <SectionHead index={2} title="SectionHead with a lead" lead="A short lead sits under the title in the content column. The index stays Latin in both languages.">
+            <TextLink slot="action" href="#components" variant="label">View all</TextLink>
+          </SectionHead>
+        </div>
+        <div class="section pad sg-demo">
+          <CellGrid cols={3} frame>
+            <div class="pad-cell"><MediaFrame src={detail1} alt="" ratio="square" caption="ratio square · 1:1" sizes="33vw" /></div>
+            <div class="pad-cell"><MediaFrame src={cover1} alt="" ratio="portrait" caption="ratio portrait · 4:5" sizes="33vw" /></div>
+            <div class="pad-cell"><MediaFrame src={wide1} alt="" ratio="landscape" caption="ratio landscape · 3:2" sizes="33vw" /></div>
+          </CellGrid>
+        </div>
+        <div class="section">
+          <CellGrid cols={3} as="ul">
+            <ProjectCard href="#components" title="Orbit Field" summary="Generative orbits in a single hairline system." discipline="creative-coding" year={2026} index={4} cover={cover1} coverAlt="" locale="en" />
+            <ProjectCard href="#components" title="Index of Nights" discipline="web" year={2025} index={3} cover={cover2} coverAlt="" locale="en" />
+            <ProjectCard href="#components" title="Event Horizon Studies" discipline="visual-art" year={2025} index={1} cover={cover3} coverAlt="" locale="en" />
+          </CellGrid>
+        </div>
+      </section>
+
+      <section class="section" id="notch" aria-labelledby="notch-title">
+        <header class="pad sg-section-head">
+          <span class="t-label u-muted">{indexSign(9)}</span>
+          <h2 id="notch-title" class="t-xl">NotchCard</h2>
+        </header>
+        <p class="pad measure u-muted sg-note">
+          The only rounded element. Notches are a CSS mask — the ground shows through. Size and
+          position: <code>--notch-w</code>, <code>--notch-h</code>, <code>--notch-gap</code>,
+          <code>--notch-media-ratio</code>. Toggle RTL above to see the mirror.
+        </p>
+        <NotchRow label="NotchCard examples">
+          <NotchCard label="Visual art" meta="06 WORKS" title="Event horizon studies" description="Acrylic and digital studies of light at the edge." href="#notch" action="View" progress={0.15} src={detail2} />
+          <NotchCard label="Music" meta="02:40" title="Low frequency garden" description="Sound for an installation, in one long breath." href="#notch" action="Add to cart" progress={0.5} src={detail1} />
+          <NotchCard label="Phase 02" meta="W05–W08" title="Build" description="Media slot with custom content instead of an image." href="#notch" action="View" progress={0.85}>
+            <span slot="media" class="sg-notch-media t-3xl"><bdi lang="en">02</bdi></span>
+          </NotchCard>
+        </NotchRow>
+      </section>
+
       <slot />
     </div>
   </div>
@@ -372,6 +529,63 @@ const sections = [
       background: var(--color-media);
       border: var(--line-width) solid var(--color-line);
     }
+
+    .sg-accent {
+      display: grid;
+      gap: var(--space-lg);
+      padding-block: var(--space-xl);
+    }
+
+    .sg-picker {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+
+    .sg-picker input {
+      inline-size: var(--hit-target);
+      block-size: var(--hit-target);
+      border: var(--line-width) solid var(--color-line-strong);
+      background: none;
+      padding: 0;
+    }
+
+    .sg-accent-fill {
+      display: block;
+      block-size: var(--space-2xl);
+      background: var(--color-accent);
+    }
+
+    .sg-focus-demo {
+      outline: var(--line-width-strong) solid var(--color-focus);
+      outline-offset: var(--line-width-strong);
+      justify-self: start;
+    }
+
+    .sg-accent-check {
+      accent-color: var(--color-accent);
+      inline-size: var(--space-md);
+      block-size: var(--space-md);
+    }
+
+    .sg-demo {
+      padding-block: var(--space-xl);
+    }
+
+    .sg-cell {
+      min-block-size: var(--space-4xl);
+    }
+
+    .sg-note {
+      padding-block: var(--space-lg);
+    }
+
+    .sg-notch-media {
+      display: grid;
+      place-items: center;
+      block-size: 100%;
+      color: var(--color-notch-ink);
+    }
   }
 </style>
 
@@ -445,6 +659,17 @@ const sections = [
       requestAnimationFrame(refresh);
     });
 
+    const picker = root.querySelector<HTMLInputElement>('[data-accent-picker]');
+    picker?.addEventListener('input', () => {
+      html.style.setProperty('--color-accent', picker.value);
+      requestAnimationFrame(refresh);
+    });
+    root.querySelector('[data-accent-reset]')?.addEventListener('click', () => {
+      html.style.removeProperty('--color-accent');
+      if (picker) picker.value = '#d97757';
+      requestAnimationFrame(refresh);
+    });
+
     const observer = new MutationObserver(() => requestAnimationFrame(refresh));
     observer.observe(html, { attributes: true, attributeFilter: ['data-theme', 'data-mode'] });
     const mq = window.matchMedia('(prefers-color-scheme: dark)');
@@ -454,6 +679,7 @@ const sections = [
       () => {
         observer.disconnect();
         mq.removeEventListener('change', refresh);
+        html.style.removeProperty('--color-accent');
       },
       { once: true },
     );

@@ -1,0 +1,71 @@
+---
+/**
+ * Label — small uppercase monospace text for labels, metadata and prices.
+ *
+ *   <Label>Year</Label>                    → YEAR
+ *   <Label bracket>Visual art</Label>      → [ VISUAL ART ]
+ *   <Label index={1}>Work</Label>          → (01) WORK
+ *   <Label code>W07</Label>                → Latin code, always mono, even in fa
+ *
+ * `code` wraps the content in <bdi lang="en"> so digits stay Latin, the mono
+ * face is used and punctuation never jumps inside RTL text.
+ */
+import { indexSign } from '../i18n/utils';
+
+interface Props {
+  as?: 'span' | 'p' | 'div' | 'dt' | 'dd' | 'li' | 'h2' | 'h3' | 'strong';
+  bracket?: boolean;
+  index?: number;
+  code?: boolean;
+  tone?: 'muted' | 'ink' | 'accent' | 'inherit';
+  class?: string;
+  [key: string]: unknown;
+}
+
+const {
+  as: Tag = 'span',
+  bracket = false,
+  index,
+  code = false,
+  tone = 'muted',
+  class: className,
+  ...rest
+} = Astro.props;
+---
+
+<Tag class:list={['t-label', 'label', `label--${tone}`, className]} {...rest}>
+  {index !== undefined && <bdi lang="en" class="label__index">{indexSign(index)}</bdi>}
+  {bracket && <span aria-hidden="true">[&nbsp;</span>}
+  {code ? (<bdi lang="en"><slot /></bdi>) : <slot />}
+  {bracket && <span aria-hidden="true">&nbsp;]</span>}
+</Tag>
+
+<style>
+  @layer components {
+    .label {
+      display: inline-flex;
+      align-items: baseline;
+      gap: 0;
+    }
+
+    .label__index {
+      margin-inline-end: var(--space-xs);
+    }
+
+    .label--muted {
+      color: var(--color-ink-muted);
+    }
+
+    .label--ink {
+      color: var(--color-ink);
+    }
+
+    .label--accent {
+      color: var(--color-accent-ink);
+    }
+
+    .label--inherit {
+      color: inherit;
+    }
+  }
+</style>

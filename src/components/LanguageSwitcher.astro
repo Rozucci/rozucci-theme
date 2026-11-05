@@ -1,0 +1,68 @@
+---
+/**
+ * LanguageSwitcher — links to the *same page* in each other language.
+ * Works for every route because both locales share one route structure
+ * (projects are paired by file name).
+ */
+import type { LocaleCode } from '../site.config';
+import { otherLocales, switchLocalePath, useTranslations } from '../i18n/utils';
+
+interface Props {
+  locale: LocaleCode;
+  /** Show the full language name instead of the short code. */
+  long?: boolean;
+  class?: string;
+}
+
+const { locale, long = false, class: className } = Astro.props;
+const t = useTranslations(locale);
+const targets = otherLocales(locale).map((l) => ({
+  ...l,
+  href: switchLocalePath(Astro.url.pathname, l.code),
+}));
+---
+
+<ul role="list" class:list={['lang-switch', className]} aria-label={t.a11y.languageSwitcher}>
+  {
+    targets.map((l) => (
+      <li>
+        <a
+          class="lang-switch__link t-label"
+          href={l.href}
+          hreflang={l.lang}
+          lang={l.lang}
+          aria-label={l.label}
+          data-lang-switch
+        >
+          {long ? l.label : l.short}
+        </a>
+      </li>
+    ))
+  }
+</ul>
+
+<style>
+  @layer components {
+    .lang-switch {
+      display: flex;
+      gap: var(--space-sm);
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .lang-switch__link {
+      display: inline-flex;
+      align-items: center;
+      min-block-size: var(--hit-target);
+      color: var(--color-ink);
+      text-decoration: none;
+    }
+
+    .lang-switch__link:hover {
+      text-decoration: underline;
+      text-decoration-thickness: var(--line-width);
+      text-underline-offset: 0.25em;
+    }
+  }
+</style>

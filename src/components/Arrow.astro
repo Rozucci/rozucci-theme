@@ -1,0 +1,31 @@
+---
+/**
+ * Arrow — a text-sign arrow that mirrors in RTL.
+ * `direction="forward"` points to the reading direction (→ in LTR, ← in RTL).
+ */
+interface Props {
+  direction?: 'forward' | 'back' | 'up' | 'down';
+  class?: string;
+}
+
+const { direction = 'forward', class: className } = Astro.props;
+const glyph = { forward: '→', back: '←', up: '↑', down: '↓' }[direction];
+const mirrors = direction === 'forward' || direction === 'back';
+---
+
+<span class:list={['arrow', { 'arrow--mirror': mirrors }, className]} aria-hidden="true">{glyph}</span>
+
+<style>
+  @layer components {
+    .arrow {
+      display: inline-block;
+      font-family: var(--font-mono);
+      line-height: 1;
+      transition: transform var(--dur-fast) var(--ease-standard);
+    }
+
+    .arrow--mirror:dir(rtl) {
+      transform: scaleX(-1);
+    }
+  }
+</style>

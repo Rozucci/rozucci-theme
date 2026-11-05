@@ -4,8 +4,9 @@
  * A theme only remaps semantic colour roles. Each role is one line:
  *   --role: light-dark(<light value>, <dark value>);
  * Change a value here and it changes everywhere the role is used, in both
- * light and dark mode. The `:root` fallback makes ivory the theme when no
- * data-theme attribute is present.
+ * light and dark mode. --color-accent-ink and --color-focus are derived
+ * from --color-accent, so the accent really is one line.
+ * The `:root` fallback makes ivory the theme when no data-theme is present.
  */
 @layer tokens.themes {
   :root,
@@ -20,12 +21,17 @@
     --color-line-strong: light-dark(var(--p-ivory-500), var(--p-night-400));
 
     --color-accent: light-dark(var(--p-clay-500), var(--p-clay-500));
-    --color-accent-ink: light-dark(var(--p-clay-700), var(--p-clay-400));
+    /* Derived from the accent, so changing --color-accent above also moves the
+       text-safe accent and the focus ring. Mix ratios keep AA contrast. */
+    --color-accent-ink: light-dark(
+      color-mix(in srgb, var(--color-accent) 62%, var(--p-ivory-900)),
+      color-mix(in srgb, var(--color-accent) 78%, var(--p-night-50))
+    );
     --color-on-accent: light-dark(var(--p-ivory-900), var(--p-ivory-900));
     --color-accent-2: light-dark(var(--p-olive-500), var(--p-olive-300));
     --color-accent-3: light-dark(var(--p-sky-500), var(--p-sky-300));
 
-    --color-focus: light-dark(var(--p-clay-700), var(--p-clay-400));
+    --color-focus: var(--color-accent-ink);
     --color-media: light-dark(var(--p-ivory-100), var(--p-night-850));
     --color-selection: light-dark(var(--p-ivory-900), var(--p-night-50));
     --color-on-selection: light-dark(var(--p-ivory-50), var(--p-night-900));

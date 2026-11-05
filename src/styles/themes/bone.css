@@ -16,7 +16,10 @@
     --color-line-strong: light-dark(var(--p-ink-950), var(--p-cap-300));
 
     --color-accent: light-dark(var(--p-olive-glass-600), var(--p-olive-glass-400));
-    --color-accent-ink: light-dark(var(--p-olive-glass-800), var(--p-olive-glass-200));
+    --color-accent-ink: light-dark(
+      color-mix(in srgb, var(--color-accent) 52%, var(--p-ink-950)),
+      color-mix(in srgb, var(--color-accent) 72%, var(--p-bone-100))
+    );
     --color-on-accent: light-dark(var(--p-ink-950), var(--p-ink-950));
     --color-accent-2: light-dark(var(--p-sage-glass-500), var(--p-sage-glass-500));
     --color-accent-3: light-dark(var(--p-olive-glass-400), var(--p-olive-glass-600));

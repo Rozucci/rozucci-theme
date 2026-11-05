@@ -1,0 +1,97 @@
+---
+/**
+ * ThemeToggle — cycles the colour mode: auto → light → dark.
+ *
+ * `auto` follows the OS (prefers-color-scheme). The choice is stored in
+ * localStorage ('rz-mode') and applied before first paint by the head
+ * bootstrap in HeadMeta.astro, so there is no flash. The *theme* (ivory/bone)
+ * is a separate axis, switched in /styleguide.
+ */
+import type { LocaleCode } from '../site.config';
+import { site } from '../site.config';
+import { useTranslations } from '../i18n/utils';
+
+interface Props {
+  locale: LocaleCode;
+  class?: string;
+}
+
+const { locale, class: className } = Astro.props;
+const t = useTranslations(locale);
+const initial = site.defaultMode;
+---
+
+<button
+  type="button"
+  class:list={['mode-toggle', 't-label', className]}
+  data-mode-toggle
+  data-name={t.a11y.themeToggle}
+  data-label-auto={t.mode.auto}
+  data-label-light={t.mode.light}
+  data-label-dark={t.mode.dark}
+  aria-label={`${t.a11y.themeToggle}: ${t.mode[initial]}`}
+>
+  <span aria-hidden="true">[&nbsp;</span><span data-mode-label>{t.mode[initial]}</span><span aria-hidden="true">&nbsp;]</span>
+</button>
+
+<style>
+  @layer components {
+    .mode-toggle {
+      display: inline-flex;
+      align-items: center;
+      min-block-size: var(--hit-target);
+      color: var(--color-ink);
+      white-space: nowrap;
+    }
+
+    .mode-toggle:hover [data-mode-label] {
+      text-decoration: underline;
+      text-decoration-thickness: var(--line-width);
+      text-underline-offset: 0.25em;
+    }
+  }
+</style>
+
+<script>
+  type Mode = 'auto' | 'light' | 'dark';
+  const ORDER: Mode[] = ['auto', 'light', 'dark'];
+  const KEY = 'rz-mode';
+  const html = document.documentElement;
+
+  const current = (): Mode => (html.dataset.mode as Mode | undefined) ?? 'auto';
+
+  function render() {
+    const mode = current();
+    document.querySelectorAll<HTMLButtonElement>('[data-mode-toggle]').forEach((btn) => {
+      const key = `label${mode[0]!.toUpperCase()}${mode.slice(1)}` as const;
+      const label = btn.dataset[key] ?? mode;
+      const out = btn.querySelector('[data-mode-label]');
+      if (out) out.textContent = label;
+      btn.setAttribute('aria-label', `${btn.dataset.name}: ${label}`);
+    });
+  }
+
+  function setMode(mode: Mode) {
+    if (mode === 'auto') html.removeAttribute('data-mode');
+    else html.dataset.mode = mode;
+    try {
+      if (mode === 'auto') localStorage.removeItem(KEY);
+      else localStorage.setItem(KEY, mode);
+    } catch {
+      /* storage blocked — mode lasts for this page view */
+    }
+    render();
+    document.dispatchEvent(new CustomEvent('rz:mode-change', { detail: mode }));
+  }
+
+  // Delegated once: survives view-transition swaps of the header.
+  document.addEventListener('click', (e) => {
+    const btn = (e.target as Element | null)?.closest('[data-mode-toggle]');
+    if (!btn) return;
+    const next = ORDER[(ORDER.indexOf(current()) + 1) % ORDER.length]!;
+    setMode(next);
+  });
+  document.addEventListener('rz:mode-change', render);
+  document.addEventListener('astro:page-load', render);
+  render();
+</script>

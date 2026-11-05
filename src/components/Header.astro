@@ -1,14 +1,162 @@
 ---
+/**
+ * Header — a single hairline row of cells: wordmark · text-only nav ·
+ * language · colour mode. Sticky; on narrow screens the nav drops to its own
+ * row. The current page is bracketed: [ WORK ].
+ */
+import LanguageSwitcher from './LanguageSwitcher.astro';
+import ThemeToggle from './ThemeToggle.astro';
 import type { LocaleCode } from '../site.config';
 import { site } from '../site.config';
-import { localizePath, useTranslations } from '../i18n/utils';
-interface Props { locale: LocaleCode }
+import { localizePath, routeFromPathname, useTranslations } from '../i18n/utils';
+
+interface Props {
+  locale: LocaleCode;
+}
+
 const { locale } = Astro.props;
 const t = useTranslations(locale);
+const route = routeFromPathname(Astro.url.pathname);
+const items = site.nav.map((item) => ({
+  ...item,
+  href: localizePath(item.href, locale),
+  current: route === item.href || route.startsWith(item.href),
+}));
 ---
-<header class="pad">
-  <a href={localizePath('/', locale)}>{site.name}</a>
-  <nav aria-label={t.a11y.primaryNav}>
-    {site.nav.map((item) => <a href={localizePath(item.href, locale)}>{t.nav[item.key]}</a>)}
+
+<header class="site-header" data-site-header>
+  <a class="site-header__brand cell" href={localizePath('/', locale)} aria-label={site.name}>
+    <bdi lang="en" class="wordmark">{site.name}</bdi>
+  </a>
+
+  <nav class="site-header__nav cell" aria-label={t.a11y.primaryNav}>
+    <ul role="list">
+      {
+        items.map((item) => (
+          <li>
+            <a
+              class="site-header__link t-label"
+              href={item.href}
+              aria-current={item.current ? 'page' : undefined}
+            >
+              {t.nav[item.key]}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
   </nav>
+
+  <div class="site-header__lang cell">
+    <LanguageSwitcher locale={locale} />
+  </div>
+  <div class="site-header__mode cell">
+    <ThemeToggle locale={locale} />
+  </div>
 </header>
+
+<style>
+  @layer components {
+    .site-header {
+      position: sticky;
+      inset-block-start: 0;
+      z-index: var(--z-header);
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto auto;
+      grid-template-areas:
+        'brand lang mode'
+        'nav nav nav';
+      background: var(--color-canvas);
+      border-block-end: var(--line-width) solid var(--color-line);
+    }
+
+    .cell {
+      display: flex;
+      align-items: center;
+      min-block-size: var(--header-h);
+      padding-inline: var(--gutter);
+    }
+
+    .site-header__brand {
+      grid-area: brand;
+      color: var(--color-ink);
+      text-decoration: none;
+    }
+
+    .wordmark {
+      font-family: var(--font-brand);
+      font-size: var(--text-md);
+      line-height: 1;
+      letter-spacing: var(--tracking-display);
+    }
+
+    .site-header__nav {
+      grid-area: nav;
+      border-block-start: var(--line-width) solid var(--color-line);
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .site-header__nav ul {
+      display: flex;
+      gap: var(--space-lg);
+      margin: 0;
+      padding: 0;
+    }
+
+    .site-header__lang {
+      grid-area: lang;
+      border-inline-start: var(--line-width) solid var(--color-line);
+    }
+
+    .site-header__mode {
+      grid-area: mode;
+      border-inline-start: var(--line-width) solid var(--color-line);
+    }
+
+    .site-header__link {
+      display: inline-flex;
+      align-items: center;
+      min-block-size: var(--hit-target);
+      color: var(--color-ink-muted);
+      text-decoration: none;
+      white-space: nowrap;
+      transition: color var(--dur-hover) var(--ease-standard);
+    }
+
+    .site-header__link::before,
+    .site-header__link::after {
+      visibility: hidden;
+    }
+
+    .site-header__link::before {
+      content: '[\00a0';
+    }
+
+    .site-header__link::after {
+      content: '\00a0]';
+    }
+
+    .site-header__link:hover,
+    .site-header__link[aria-current='page'] {
+      color: var(--color-ink);
+    }
+
+    .site-header__link[aria-current='page']::before,
+    .site-header__link[aria-current='page']::after {
+      visibility: visible;
+    }
+
+    @media (min-width: 48rem) {
+      .site-header {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 3fr) auto auto;
+        grid-template-areas: 'brand nav lang mode';
+      }
+
+      .site-header__nav {
+        border-block-start: 0;
+        border-inline-start: var(--line-width) solid var(--color-line);
+      }
+    }
+  }
+</style>

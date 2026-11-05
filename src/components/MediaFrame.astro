@@ -1,0 +1,115 @@
+---
+/**
+ * MediaFrame — media on a flat ground with a fixed aspect ratio.
+ *
+ * Renders an astro:assets <Picture> (AVIF + WebP, responsive srcset) inside a
+ * frame whose ratio comes from a token. Without an image it shows the flat
+ * media ground, so layouts never jump. Motion hooks:
+ *   data-reveal="media" → clip-path wipe + scale settle
+ *   data-parallax        → gentle vertical drift of the inner layer
+ */
+import type { ImageMetadata } from 'astro';
+import { Picture } from 'astro:assets';
+
+type Ratio = 'square' | 'portrait' | 'landscape' | 'wide' | 'cinema';
+
+interface Props {
+  src?: ImageMetadata;
+  alt?: string;
+  ratio?: Ratio;
+  /** `sizes` attribute — how wide the frame renders at each breakpoint. */
+  sizes?: string;
+  widths?: number[];
+  /** Above the fold: load eagerly with high fetch priority (LCP image). */
+  priority?: boolean;
+  caption?: string;
+  reveal?: boolean;
+  parallax?: boolean;
+  class?: string;
+}
+
+const {
+  src,
+  alt = '',
+  ratio = 'landscape',
+  sizes = '(min-width: 64rem) 50vw, 100vw',
+  widths = [480, 800, 1200, 1600],
+  priority = false,
+  caption,
+  reveal = true,
+  parallax = false,
+  class: className,
+} = Astro.props;
+
+const usableWidths = src ? widths.filter((w) => w <= src.width) : widths;
+---
+
+<figure
+  class:list={['media', { 'media--parallax': parallax }, className]}
+  style={`--media-ratio: var(--ratio-${ratio})`}
+  data-reveal={reveal ? 'media' : undefined}
+>
+  <div class="media__frame">
+    <div class="media__inner" data-parallax={parallax ? '' : undefined}>
+      {
+        src && (
+          <Picture
+            src={src}
+            alt={alt}
+            formats={['avif', 'webp']}
+            fallbackFormat="jpg"
+            widths={usableWidths.length ? usableWidths : [src.width]}
+            sizes={sizes}
+            loading={priority ? 'eager' : 'lazy'}
+            decoding={priority ? 'sync' : 'async'}
+            fetchpriority={priority ? 'high' : 'auto'}
+            class="media__img"
+          />
+        )
+      }
+    </div>
+  </div>
+  {caption && <figcaption class="media__caption t-label u-muted">{caption}</figcaption>}
+</figure>
+
+<style>
+  @layer components {
+    .media {
+      display: grid;
+      gap: var(--space-xs);
+    }
+
+    .media__frame {
+      position: relative;
+      aspect-ratio: var(--media-ratio);
+      overflow: hidden;
+      background: var(--color-media);
+      border-radius: var(--media-radius, var(--radius));
+    }
+
+    .media__inner {
+      position: absolute;
+      inset: 0;
+    }
+
+    /* Extra bleed so the parallax drift never reveals an edge. */
+    :global(html.motion) .media--parallax .media__inner {
+      inset: calc(-1 * var(--parallax-amount)) 0;
+    }
+
+    .media__inner :global(picture),
+    .media__inner :global(img) {
+      display: block;
+      inline-size: 100%;
+      block-size: 100%;
+    }
+
+    .media__inner :global(img) {
+      object-fit: cover;
+    }
+
+    .media__caption {
+      padding-block-start: var(--space-2xs);
+    }
+  }
+</style>

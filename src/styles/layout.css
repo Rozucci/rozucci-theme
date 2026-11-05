@@ -22,13 +22,29 @@
     flex: 1;
   }
 
-  /* A section separated from the previous one by a hairline. */
+  /*
+   * A section separated from the previous one by a hairline. The line is a
+   * pseudo-element so the motion layer can draw it in (scaleX of --draw).
+   * Sections are wrappers: do not use ::before on them for anything else.
+   */
   .section {
-    border-block-start: var(--line-width) solid var(--color-line);
+    position: relative;
   }
 
-  .section--flush {
-    border-block-start: 0;
+  .section::before {
+    content: '';
+    position: absolute;
+    inset-inline: 0;
+    inset-block-start: 0;
+    block-size: var(--line-width);
+    background: var(--color-line);
+    transform: scaleX(var(--draw, 1));
+    transform-origin: var(--origin-inline-start);
+    pointer-events: none;
+  }
+
+  .section--flush::before {
+    display: none;
   }
 
   .pad {

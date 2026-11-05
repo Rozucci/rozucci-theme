@@ -1,0 +1,62 @@
+---
+/**
+ * SectionHead — numbered section header: (01) on the start column, title (and
+ * optional lead) in the content column, optional action at the end. Place it
+ * first inside a `.section` — the section's top hairline draws in on scroll.
+ */
+import { indexSign } from '../i18n/utils';
+
+interface Props {
+  index: number;
+  title: string;
+  lead?: string;
+  id?: string;
+  level?: 'h1' | 'h2' | 'h3';
+  size?: 'xl' | '2xl' | 'lg';
+}
+
+const { index, title, lead, id, level: Heading = 'h2', size = 'xl' } = Astro.props;
+const hasAction = Astro.slots.has('action');
+---
+
+<header class="section-head pad">
+  <span class="t-label u-muted section-head__index"><bdi lang="en">{indexSign(index)}</bdi></span>
+  <div class="section-head__main">
+    <Heading id={id} class:list={[`t-${size}`, 'section-head__title']} data-reveal="lines">{title}</Heading>
+    {lead && <p class="section-head__lead u-muted measure">{lead}</p>}
+  </div>
+  {hasAction && <div class="section-head__action"><slot name="action" /></div>}
+</header>
+
+<style>
+  @layer components {
+    .section-head {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--space-sm) var(--space-lg);
+      padding-block: var(--space-xl) var(--space-lg);
+      align-items: baseline;
+    }
+
+    @media (min-width: 48rem) {
+      .section-head {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 3fr) auto;
+        padding-block: var(--space-2xl) var(--space-xl);
+      }
+    }
+
+    .section-head__main {
+      display: grid;
+      gap: var(--space-sm);
+    }
+
+    .section-head__lead {
+      font-size: var(--text-md);
+      line-height: var(--leading-snug);
+    }
+
+    .section-head__action {
+      align-self: end;
+    }
+  }
+</style>

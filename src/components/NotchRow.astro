@@ -1,0 +1,54 @@
+---
+/**
+ * NotchRow — the darker ground NotchCards sit on. A horizontal row: a grid on
+ * wide screens, a native scroll-snapping strip on narrow ones (no
+ * scroll-jacking). Children are NotchCards.
+ */
+interface Props {
+  label?: string;
+  class?: string;
+}
+
+const { label, class: className } = Astro.props;
+---
+
+<div class:list={['notch-row', className]}>
+  <div class="notch-row__track scroll-x" role={label ? "region" : undefined} aria-label={label} tabindex={label ? 0 : undefined}>
+    <slot />
+  </div>
+</div>
+
+<style>
+  @layer components {
+    .notch-row {
+      background: var(--color-notch-ground);
+      padding-block: var(--space-xl);
+    }
+
+    .notch-row__track {
+      display: grid;
+      grid-auto-flow: column;
+      grid-auto-columns: min(80%, var(--card-min));
+      gap: var(--space-sm);
+      padding-inline: var(--gutter);
+      scroll-snap-type: inline mandatory;
+      scroll-padding-inline: var(--gutter);
+    }
+
+    .notch-row__track:focus-visible {
+      outline-offset: calc(-1 * var(--line-width-strong));
+    }
+
+    .notch-row__track > :global(*) {
+      scroll-snap-align: start;
+    }
+
+    @media (min-width: 64rem) {
+      .notch-row__track {
+        grid-auto-flow: row;
+        grid-template-columns: repeat(auto-fit, minmax(min(var(--card-min), 100%), 1fr));
+        overflow: visible;
+      }
+    }
+  }
+</style>
