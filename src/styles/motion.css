@@ -1,0 +1,20 @@
+/*
+ * Global motion states.
+ *
+ * Hide-before-reveal styles apply ONLY under `html.js.motion`. The inline
+ * head script adds `.motion` when motion flags allow it and the visitor has
+ * not asked for reduced motion; a safety timer removes it if the motion
+ * bundle never starts. Without JS every element is visible.
+ */
+@layer base {
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: var(--dur-instant) !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: var(--dur-instant) !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}

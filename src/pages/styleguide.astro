@@ -1,0 +1,468 @@
+---
+/**
+ * /styleguide — living style guide (noindex, not in the nav).
+ *
+ * Every token list below is parsed from the token/theme CSS at build time, so
+ * the guide can never drift from the source. Colour values are read from the
+ * browser at runtime, so they always show the active theme and mode.
+ *
+ * This page is a developer tool: its copy is English and inline by design.
+ */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import semanticCss from '../styles/tokens/semantic.css?raw';
+import ivoryCss from '../styles/themes/ivory.css?raw';
+import { site } from '../site.config';
+import { indexSign } from '../i18n/utils';
+
+const rootBlock = semanticCss.split(/\n\s*:root\[data-mode/)[0] ?? semanticCss;
+const names = (src: string, prefix: string) =>
+  [...new Set([...src.matchAll(new RegExp(`(--${prefix}[a-z0-9-]*)\\s*:`, 'g'))].map((m) => m[1]!))];
+
+const colorRoles = names(ivoryCss, 'color-');
+const textTokens = names(rootBlock, 'text-');
+const spaceTokens = names(rootBlock, 'space-').filter((n) => n !== '--space-0');
+const durTokens = names(rootBlock, 'dur-');
+const easeTokens = names(rootBlock, 'ease-');
+const ratioTokens = names(rootBlock, 'ratio-');
+const fontTokens = names(rootBlock, 'font-');
+const shapeTokens = [
+  ...names(rootBlock, 'line-width'),
+  ...names(rootBlock, 'radius'),
+  ...names(rootBlock, 'notch-'),
+];
+
+const sections = [
+  { id: 'colour', title: 'Colour roles' },
+  { id: 'type', title: 'Type' },
+  { id: 'space', title: 'Space' },
+  { id: 'shape', title: 'Lines, radius, ratios' },
+  { id: 'motion-tokens', title: 'Motion tokens' },
+];
+---
+
+<BaseLayout locale="en" title="Style guide" noindex dir="ltr">
+  <div class="sg" data-sg>
+    <section class="section section--flush pad sg-head">
+      <p class="t-label u-muted">Rozucci theme · living style guide</p>
+      <h1 class="t-3xl">Style guide</h1>
+      <p class="measure u-muted">
+        Every value on this page is read from the token files. Switch theme, mode or direction and
+        the whole site follows. Edit <code>src/styles/themes/ivory.css</code> → <code>--color-accent</code>
+        to see one change travel everywhere.
+      </p>
+
+      <div class="sg-controls" role="group" aria-label="Preview controls">
+        <div class="sg-control">
+          <span class="t-label u-muted">Theme</span>
+          <div class="cluster sg-buttons">
+            {
+              site.themes.map((name) => (
+                <button type="button" class="t-label sg-btn" data-set-theme={name} aria-pressed="false">
+                  [ {name} ]
+                </button>
+              ))
+            }
+          </div>
+        </div>
+        <div class="sg-control">
+          <span class="t-label u-muted">Mode</span>
+          <div class="cluster sg-buttons">
+            {
+              ['auto', 'light', 'dark'].map((m) => (
+                <button type="button" class="t-label sg-btn" data-set-mode={m} aria-pressed="false">
+                  [ {m} ]
+                </button>
+              ))
+            }
+          </div>
+        </div>
+        <div class="sg-control">
+          <span class="t-label u-muted">Direction</span>
+          <div class="cluster sg-buttons">
+            <button type="button" class="t-label sg-btn" data-set-dir="ltr" aria-pressed="true">[ LTR · en ]</button>
+            <button type="button" class="t-label sg-btn" data-set-dir="rtl" aria-pressed="false">[ RTL · fa ]</button>
+          </div>
+        </div>
+      </div>
+
+      <nav class="sg-toc" aria-label="Style guide sections">
+        <ol role="list" class="cluster">
+          {
+            sections.map((s, i) => (
+              <li>
+                <a class="t-label" href={`#${s.id}`}>
+                  {indexSign(i + 1)} {s.title}
+                </a>
+              </li>
+            ))
+          }
+        </ol>
+      </nav>
+    </section>
+
+    <div class="sg-preview" data-sg-preview>
+      <section class="section" id="colour" aria-labelledby="colour-title">
+        <header class="pad sg-section-head">
+          <span class="t-label u-muted">{indexSign(1)}</span>
+          <h2 id="colour-title" class="t-xl">Colour roles</h2>
+        </header>
+        <ul role="list" class="sg-swatches">
+          {
+            colorRoles.map((role) => (
+              <li class="sg-swatch">
+                <span class="sg-chip" style={`background: var(${role})`} data-swatch />
+                <code class="t-label">{role}</code>
+                <span class="t-label u-muted" data-swatch-value>
+                  —
+                </span>
+              </li>
+            ))
+          }
+        </ul>
+      </section>
+
+      <section class="section" id="type" aria-labelledby="type-title">
+        <header class="pad sg-section-head">
+          <span class="t-label u-muted">{indexSign(2)}</span>
+          <h2 id="type-title" class="t-xl">Type</h2>
+        </header>
+        <ul role="list" class="sg-rows">
+          {
+            fontTokens.map((token) => (
+              <li class="sg-row">
+                <code class="t-label">{token}</code>
+                <span class="sg-font-sample" style={`font-family: var(${token})`}>
+                  Rozucci 0123 — رزوچی ۰۱۲۳
+                </span>
+              </li>
+            ))
+          }
+          {
+            [...textTokens].reverse().map((token) => (
+              <li class="sg-row">
+                <code class="t-label">{token}</code>
+                <span
+                  class="sg-type-sample"
+                  style={`font-size: var(${token}); font-family: ${
+                    token === '--text-2xs' || token === '--text-xs' ? 'var(--font-mono)' : 'var(--font-display)'
+                  }`}
+                >
+                  Image, motion, code
+                </span>
+              </li>
+            ))
+          }
+          <li class="sg-row">
+            <code class="t-label">.t-label</code>
+            <span class="t-label">[+] Add to cart · (01) · /work · 2026</span>
+          </li>
+          <li class="sg-row" lang="fa" dir="rtl">
+            <code class="t-label" lang="en" dir="ltr">.t-label (fa)</code>
+            <span class="t-label">[+] افزودن · (01) · <bdi>/work</bdi> · ۱۴۰۵</span>
+          </li>
+          <li class="sg-row">
+            <code class="t-label">body</code>
+            <p class="measure">
+              Rozucci is a one-person studio. Ideas arrive from physics, cosmology and night-time
+              silence; they leave as images, films, websites and systems.
+            </p>
+          </li>
+          <li class="sg-row" lang="fa" dir="rtl">
+            <code class="t-label" lang="en" dir="ltr">body (fa)</code>
+            <p class="measure">
+              رزوچی یک استودیوی یک‌نفره است. ایده‌ها از فیزیک، کیهان‌شناسی و سکوتِ شب می‌آیند و به شکل
+              تصویر، فیلم، وب‌سایت و سیستم بیرون می‌روند.
+            </p>
+          </li>
+        </ul>
+      </section>
+
+      <section class="section" id="space" aria-labelledby="space-title">
+        <header class="pad sg-section-head">
+          <span class="t-label u-muted">{indexSign(3)}</span>
+          <h2 id="space-title" class="t-xl">Space</h2>
+        </header>
+        <ul role="list" class="sg-rows">
+          {
+            spaceTokens.map((token) => (
+              <li class="sg-row">
+                <code class="t-label">{token}</code>
+                <span class="sg-bar" style={`inline-size: var(${token})`} />
+              </li>
+            ))
+          }
+        </ul>
+      </section>
+
+      <section class="section" id="shape" aria-labelledby="shape-title">
+        <header class="pad sg-section-head">
+          <span class="t-label u-muted">{indexSign(4)}</span>
+          <h2 id="shape-title" class="t-xl">Lines, radius, ratios</h2>
+        </header>
+        <ul role="list" class="sg-rows">
+          {
+            shapeTokens.map((token) => (
+              <li class="sg-row">
+                <code class="t-label">{token}</code>
+                <span class="t-label u-muted" data-token-value={token}>
+                  —
+                </span>
+              </li>
+            ))
+          }
+        </ul>
+        <ul role="list" class="sg-ratios pad">
+          {
+            ratioTokens.map((token) => (
+              <li class="stack stack-sm">
+                <span class="sg-ratio" style={`aspect-ratio: var(${token})`} />
+                <code class="t-label">{token}</code>
+              </li>
+            ))
+          }
+        </ul>
+      </section>
+
+      <section class="section" id="motion-tokens" aria-labelledby="motion-title">
+        <header class="pad sg-section-head">
+          <span class="t-label u-muted">{indexSign(5)}</span>
+          <h2 id="motion-title" class="t-xl">Motion tokens</h2>
+        </header>
+        <ul role="list" class="sg-rows">
+          {
+            [...durTokens, ...easeTokens].map((token) => (
+              <li class="sg-row">
+                <code class="t-label">{token}</code>
+                <span class="t-label u-muted" data-token-value={token}>
+                  —
+                </span>
+              </li>
+            ))
+          }
+        </ul>
+      </section>
+
+      <slot />
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  @layer components {
+    .sg-head {
+      padding-block: var(--space-3xl) var(--space-2xl);
+      display: grid;
+      gap: var(--space-lg);
+    }
+
+    .sg-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-lg) var(--space-2xl);
+    }
+
+    .sg-control {
+      display: grid;
+      gap: var(--space-xs);
+    }
+
+    .sg-buttons {
+      --cluster-gap: var(--space-xs);
+    }
+
+    .sg-btn {
+      min-block-size: var(--hit-target);
+      padding-inline: var(--space-sm);
+      border: var(--line-width) solid var(--color-line);
+      color: var(--color-ink-muted);
+      transition:
+        color var(--dur-hover) var(--ease-standard),
+        border-color var(--dur-hover) var(--ease-standard);
+    }
+
+    .sg-btn:hover {
+      color: var(--color-ink);
+      border-color: var(--color-line-strong);
+    }
+
+    .sg-btn[aria-pressed='true'] {
+      color: var(--color-ink);
+      border-color: var(--color-ink);
+    }
+
+    .sg-toc ol {
+      --cluster-gap: var(--space-md);
+    }
+
+    .sg-toc a {
+      text-decoration: none;
+    }
+
+    .sg-section-head {
+      display: flex;
+      align-items: baseline;
+      gap: var(--space-md);
+      padding-block: var(--space-xl);
+      border-block-end: var(--line-width) solid var(--color-line);
+    }
+
+    .sg-swatches {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(min(15rem, 100%), 1fr));
+    }
+
+    .sg-swatch {
+      display: grid;
+      gap: var(--space-2xs);
+      padding: var(--cell-pad);
+      border-block-end: var(--line-width) solid var(--color-line);
+      border-inline-end: var(--line-width) solid var(--color-line);
+    }
+
+    .sg-chip {
+      display: block;
+      block-size: var(--space-4xl);
+      border: var(--line-width) solid var(--color-line);
+      margin-block-end: var(--space-xs);
+    }
+
+    .sg-rows {
+      display: grid;
+    }
+
+    .sg-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--space-xs) var(--space-lg);
+      align-items: baseline;
+      padding: var(--space-md) var(--gutter);
+      border-block-end: var(--line-width) solid var(--color-line);
+    }
+
+    @media (min-width: 48rem) {
+      .sg-row {
+        grid-template-columns: minmax(10rem, 1fr) minmax(0, 4fr);
+      }
+    }
+
+    .sg-type-sample {
+      line-height: var(--leading-heading);
+      overflow-wrap: anywhere;
+    }
+
+    .sg-font-sample {
+      font-size: var(--text-lg);
+    }
+
+    .sg-bar {
+      display: block;
+      block-size: var(--space-xs);
+      background: var(--color-ink);
+    }
+
+    .sg-ratios {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(min(9rem, 100%), 1fr));
+      gap: var(--space-lg);
+      padding-block: var(--space-xl);
+    }
+
+    .sg-ratio {
+      display: block;
+      background: var(--color-media);
+      border: var(--line-width) solid var(--color-line);
+    }
+  }
+</style>
+
+<script>
+  /* Style guide controls + live token values. Re-binds after view transitions. */
+  function toHex(rgb: string): string {
+    const m = rgb.match(/[\d.]+/g);
+    if (!m || m.length < 3) return rgb;
+    const [r, g, b, a] = m.map(Number);
+    const hex = '#' + [r, g, b].map((v) => Math.round(v!).toString(16).padStart(2, '0')).join('');
+    return a !== undefined && a < 1 ? `${hex} · α${a}` : hex;
+  }
+
+  function store(key: string, value: string | null) {
+    try {
+      if (value === null) localStorage.removeItem(key);
+      else localStorage.setItem(key, value);
+    } catch {
+      /* storage unavailable — choice lasts for this page view only */
+    }
+  }
+
+  function init() {
+    const root = document.querySelector<HTMLElement>('[data-sg]');
+    if (!root) return;
+    const html = document.documentElement;
+    const preview = root.querySelector<HTMLElement>('[data-sg-preview]');
+
+    const refresh = () => {
+      root.querySelectorAll<HTMLElement>('[data-swatch]').forEach((chip) => {
+        const out = chip.parentElement?.querySelector('[data-swatch-value]');
+        if (out) out.textContent = toHex(getComputedStyle(chip).backgroundColor);
+      });
+      const cs = getComputedStyle(html);
+      root.querySelectorAll<HTMLElement>('[data-token-value]').forEach((el) => {
+        el.textContent = cs.getPropertyValue(el.dataset.tokenValue!).trim() || '—';
+      });
+      const theme = html.dataset.theme;
+      const mode = html.dataset.mode ?? 'auto';
+      root.querySelectorAll<HTMLButtonElement>('[data-set-theme]').forEach((b) => {
+        b.setAttribute('aria-pressed', String(b.dataset.setTheme === theme));
+      });
+      root.querySelectorAll<HTMLButtonElement>('[data-set-mode]').forEach((b) => {
+        b.setAttribute('aria-pressed', String(b.dataset.setMode === mode));
+      });
+      const dir = preview?.getAttribute('dir') ?? 'ltr';
+      root.querySelectorAll<HTMLButtonElement>('[data-set-dir]').forEach((b) => {
+        b.setAttribute('aria-pressed', String(b.dataset.setDir === dir));
+      });
+    };
+
+    root.addEventListener('click', (e) => {
+      const target = (e.target as HTMLElement).closest<HTMLButtonElement>('button');
+      if (!target) return;
+      if (target.dataset.setTheme) {
+        html.dataset.theme = target.dataset.setTheme;
+        store('rz-theme', target.dataset.setTheme);
+      } else if (target.dataset.setMode) {
+        const m = target.dataset.setMode;
+        if (m === 'auto') html.removeAttribute('data-mode');
+        else html.dataset.mode = m;
+        store('rz-mode', m === 'auto' ? null : m);
+        document.dispatchEvent(new CustomEvent('rz:mode-change'));
+      } else if (target.dataset.setDir && preview) {
+        const rtl = target.dataset.setDir === 'rtl';
+        preview.setAttribute('dir', rtl ? 'rtl' : 'ltr');
+        preview.setAttribute('lang', rtl ? 'fa' : 'en');
+      } else {
+        return;
+      }
+      requestAnimationFrame(refresh);
+    });
+
+    const observer = new MutationObserver(() => requestAnimationFrame(refresh));
+    observer.observe(html, { attributes: true, attributeFilter: ['data-theme', 'data-mode'] });
+    const mq = window.matchMedia('(prefers-color-scheme: dark)');
+    mq.addEventListener('change', refresh);
+    document.addEventListener(
+      'astro:before-swap',
+      () => {
+        observer.disconnect();
+        mq.removeEventListener('change', refresh);
+      },
+      { once: true },
+    );
+    refresh();
+  }
+
+  if (document.querySelector('meta[name="astro-view-transitions-enabled"]')) {
+    document.addEventListener('astro:page-load', init);
+  } else {
+    init();
+  }
+</script>

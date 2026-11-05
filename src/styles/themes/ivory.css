@@ -1,0 +1,39 @@
+/*
+ * Theme: IVORY (default) — warm canvas, one ink, clay accent.
+ *
+ * A theme only remaps semantic colour roles. Each role is one line:
+ *   --role: light-dark(<light value>, <dark value>);
+ * Change a value here and it changes everywhere the role is used, in both
+ * light and dark mode. The `:root` fallback makes ivory the theme when no
+ * data-theme attribute is present.
+ */
+@layer tokens.themes {
+  :root,
+  [data-theme='ivory'] {
+    --color-canvas: light-dark(var(--p-ivory-50), var(--p-night-900));
+    --color-surface: light-dark(var(--p-ivory-100), var(--p-night-850));
+    --color-surface-2: light-dark(var(--p-ivory-200), var(--p-night-800));
+    --color-ink: light-dark(var(--p-ivory-900), var(--p-night-50));
+    --color-ink-muted: light-dark(var(--p-ivory-600), var(--p-night-200));
+    --color-ink-subtle: light-dark(var(--p-ivory-400), var(--p-night-400));
+    --color-line: light-dark(var(--p-ivory-300), var(--p-night-700));
+    --color-line-strong: light-dark(var(--p-ivory-500), var(--p-night-400));
+
+    --color-accent: light-dark(var(--p-clay-500), var(--p-clay-500));
+    --color-accent-ink: light-dark(var(--p-clay-700), var(--p-clay-400));
+    --color-on-accent: light-dark(var(--p-ivory-900), var(--p-ivory-900));
+    --color-accent-2: light-dark(var(--p-olive-500), var(--p-olive-300));
+    --color-accent-3: light-dark(var(--p-sky-500), var(--p-sky-300));
+
+    --color-focus: light-dark(var(--p-clay-700), var(--p-clay-400));
+    --color-media: light-dark(var(--p-ivory-100), var(--p-night-850));
+    --color-selection: light-dark(var(--p-ivory-900), var(--p-night-50));
+    --color-on-selection: light-dark(var(--p-ivory-50), var(--p-night-900));
+
+    --color-notch-ground: light-dark(var(--p-ivory-200), var(--p-night-850));
+    --color-notch-card: light-dark(var(--p-ivory-50), var(--p-night-700));
+    --color-notch-ink: light-dark(var(--p-ivory-900), var(--p-night-50));
+    --color-notch-label: light-dark(var(--p-ivory-600), var(--p-night-200));
+    --color-notch-line: light-dark(var(--p-ivory-300), var(--p-night-400));
+  }
+}

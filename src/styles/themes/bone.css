@@ -1,0 +1,35 @@
+/*
+ * Theme: BONE — stone ground, bone cards, near-black ink, olive glass accent.
+ * Built from the notched-card reference. Dark mode uses the "cap" greys.
+ *
+ * Same contract as ivory.css: remap semantic colour roles only.
+ */
+@layer tokens.themes {
+  [data-theme='bone'] {
+    --color-canvas: light-dark(var(--p-stone-400), var(--p-cap-950));
+    --color-surface: light-dark(var(--p-bone-100), var(--p-cap-900));
+    --color-surface-2: light-dark(var(--p-bone-100), var(--p-cap-800));
+    --color-ink: light-dark(var(--p-ink-950), var(--p-bone-100));
+    --color-ink-muted: light-dark(var(--p-label-700), var(--p-cap-300));
+    --color-ink-subtle: light-dark(var(--p-label-600), var(--p-cap-600));
+    --color-line: light-dark(var(--p-line-700), var(--p-cap-700));
+    --color-line-strong: light-dark(var(--p-ink-950), var(--p-cap-300));
+
+    --color-accent: light-dark(var(--p-olive-glass-600), var(--p-olive-glass-400));
+    --color-accent-ink: light-dark(var(--p-olive-glass-800), var(--p-olive-glass-200));
+    --color-on-accent: light-dark(var(--p-ink-950), var(--p-ink-950));
+    --color-accent-2: light-dark(var(--p-sage-glass-500), var(--p-sage-glass-500));
+    --color-accent-3: light-dark(var(--p-olive-glass-400), var(--p-olive-glass-600));
+
+    --color-focus: light-dark(var(--p-ink-950), var(--p-bone-100));
+    --color-media: light-dark(var(--p-bone-100), var(--p-cap-900));
+    --color-selection: light-dark(var(--p-ink-950), var(--p-bone-100));
+    --color-on-selection: light-dark(var(--p-bone-100), var(--p-ink-950));
+
+    --color-notch-ground: light-dark(var(--p-stone-400), var(--p-cap-950));
+    --color-notch-card: light-dark(var(--p-bone-100), var(--p-cap-800));
+    --color-notch-ink: light-dark(var(--p-ink-950), var(--p-bone-100));
+    --color-notch-label: light-dark(var(--p-label-700), var(--p-cap-300));
+    --color-notch-line: light-dark(var(--p-line-700), var(--p-cap-600));
+  }
+}

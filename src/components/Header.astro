@@ -1,0 +1,14 @@
+---
+import type { LocaleCode } from '../site.config';
+import { site } from '../site.config';
+import { localizePath, useTranslations } from '../i18n/utils';
+interface Props { locale: LocaleCode }
+const { locale } = Astro.props;
+const t = useTranslations(locale);
+---
+<header class="pad">
+  <a href={localizePath('/', locale)}>{site.name}</a>
+  <nav aria-label={t.a11y.primaryNav}>
+    {site.nav.map((item) => <a href={localizePath(item.href, locale)}>{t.nav[item.key]}</a>)}
+  </nav>
+</header>

@@ -1,0 +1,107 @@
+/*
+ * Layout primitives. The page is one framed column: hairlines run down both
+ * inline edges of the container and sections are separated by hairlines —
+ * the "visible grid". Cells inside sections come from the CellGrid component.
+ */
+@layer layout {
+  .container {
+    inline-size: 100%;
+    max-inline-size: var(--container);
+    margin-inline: auto;
+  }
+
+  /* The framed page column: vertical hairlines on both inline edges. */
+  .frame {
+    border-inline: var(--line-width) solid var(--color-line);
+    min-block-size: 100svh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .frame > main {
+    flex: 1;
+  }
+
+  /* A section separated from the previous one by a hairline. */
+  .section {
+    border-block-start: var(--line-width) solid var(--color-line);
+  }
+
+  .section--flush {
+    border-block-start: 0;
+  }
+
+  .pad {
+    padding-inline: var(--gutter);
+  }
+
+  .pad-block {
+    padding-block: var(--section-space);
+  }
+
+  .pad-cell {
+    padding: var(--cell-pad);
+  }
+
+  .stack {
+    display: flex;
+    flex-direction: column;
+    gap: var(--stack-gap, var(--space-md));
+  }
+
+  .stack-sm {
+    --stack-gap: var(--space-xs);
+  }
+
+  .stack-lg {
+    --stack-gap: var(--space-xl);
+  }
+
+  .stack-xl {
+    --stack-gap: var(--space-3xl);
+  }
+
+  .cluster {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--cluster-gap, var(--space-md));
+  }
+
+  .cluster--between {
+    justify-content: space-between;
+  }
+
+  /* Label column + content column (section heads, meta rows). */
+  .split {
+    display: grid;
+    gap: var(--space-lg);
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  @media (min-width: 48rem) {
+    .split {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 3fr);
+    }
+
+    .split--half {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  .measure {
+    max-inline-size: var(--measure);
+  }
+
+  .measure-wide {
+    max-inline-size: var(--measure-wide);
+  }
+
+  /* Horizontally scrolling row for wide content (tables, card rows). */
+  .scroll-x {
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-line-strong) transparent;
+  }
+}

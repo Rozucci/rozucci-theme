@@ -1,0 +1,132 @@
+---
+/**
+ * <head> contents: SEO, hreflang alternates, font preloads and the
+ * flash-free theme/motion bootstrap. Rendered by BaseLayout.
+ */
+import { site, type LocaleCode } from '../site.config';
+import {
+  absoluteUrl,
+  getLocaleDef,
+  localizePath,
+  locales,
+  defaultLocale,
+  routeFromPathname,
+  useTranslations,
+  withBase,
+} from '../i18n/utils';
+
+interface Props {
+  locale: LocaleCode;
+  title?: string;
+  description?: string;
+  noindex?: boolean;
+  /** Override alternates when a page does not exist in every locale. */
+  alternateLocales?: LocaleCode[];
+}
+
+const { locale, title, description, noindex = false, alternateLocales } = Astro.props;
+const t = useTranslations(locale);
+const def = getLocaleDef(locale);
+const fullTitle = title ? `${title}${t.meta.titleSeparator}${site.name}` : site.name;
+const desc = description ?? t.meta.siteDescription;
+
+const route = routeFromPathname(Astro.url.pathname);
+const canonical = absoluteUrl(Astro.url.pathname, Astro.site);
+const altLocales = alternateLocales ?? locales.map((l) => l.code);
+const alternates = altLocales.map((code) => ({
+  lang: getLocaleDef(code).lang,
+  href: absoluteUrl(localizePath(route, code), Astro.site),
+}));
+const xDefault = absoluteUrl(localizePath(route, defaultLocale), Astro.site);
+
+const motionOn =
+  site.motion.reveals || site.motion.smoothScroll || site.motion.parallax || site.motion.cursorLabel;
+
+const bootstrap = {
+  themes: [...site.themes],
+  defaultTheme: site.defaultTheme,
+  defaultMode: site.defaultMode,
+  motionOn,
+};
+
+/* Preload only the faces that paint first for this locale. */
+const preloads =
+  locale === 'fa'
+    ? ['fonts/vazirmatn/vazirmatn-arabic-wght-normal.woff2']
+    : ['fonts/inter/inter-latin-wght-normal.woff2', 'fonts/instrument-serif/instrument-serif-latin-400-normal.woff2'];
+---
+
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<!--
+  Cascade layer order, declared before any stylesheet so that component CSS
+  bundled into an earlier <link> can never reorder the layers.
+  Keep in sync with src/styles/global.css.
+-->
+<style is:inline>
+  @layer reset, tokens, base, layout, components, utilities;
+  @layer tokens.primitives, tokens.semantic, tokens.themes;
+</style>
+<title>{fullTitle}</title>
+<meta name="description" content={desc} />
+<link rel="canonical" href={canonical} />
+{noindex && <meta name="robots" content="noindex, nofollow" />}
+{
+  !noindex &&
+    alternates.map((a) => <link rel="alternate" hreflang={a.lang} href={a.href} />)
+}
+{!noindex && <link rel="alternate" hreflang="x-default" href={xDefault} />}
+
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content={site.name} />
+<meta property="og:title" content={fullTitle} />
+<meta property="og:description" content={desc} />
+<meta property="og:url" content={canonical} />
+<meta property="og:locale" content={def.og} />
+<meta name="color-scheme" content="light dark" />
+<link rel="icon" type="image/svg+xml" href={withBase('favicon.svg')} />
+
+{preloads.map((href) => <link rel="preload" as="font" type="font/woff2" href={withBase(href)} crossorigin />)}
+
+<!--
+  Bootstrap (runs before first paint):
+  - adds .js (progressive enhancement hook)
+  - applies saved theme + colour mode (no flash)
+  - adds .motion when motion is allowed; a safety timer removes it if the
+    motion bundle never reports ready, so content can never stay hidden
+  - re-applies all of the above after each view-transition swap
+-->
+<script is:inline define:vars={{ bootstrap }}>
+  (function () {
+    var d = document.documentElement;
+    function read(key, fallback) {
+      try {
+        return localStorage.getItem(key) || fallback;
+      } catch (e) {
+        return fallback;
+      }
+    }
+    function apply() {
+      d.classList.add('js');
+      var theme = read('rz-theme', bootstrap.defaultTheme);
+      if (bootstrap.themes.indexOf(theme) < 0) theme = bootstrap.defaultTheme;
+      d.setAttribute('data-theme', theme);
+      var mode = read('rz-mode', bootstrap.defaultMode);
+      if (mode === 'light' || mode === 'dark') d.setAttribute('data-mode', mode);
+      else d.removeAttribute('data-mode');
+      var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (bootstrap.motionOn && !reduce) {
+        d.classList.add('motion');
+        clearTimeout(window.__rzMotionTimer);
+        window.__rzMotionTimer = setTimeout(function () {
+          if (!window.__rzMotionReady) d.classList.remove('motion');
+        }, 3000);
+      }
+    }
+    apply();
+    if (!window.__rzBoot) {
+      window.__rzBoot = true;
+      document.addEventListener('astro:after-swap', apply);
+    }
+  })();
+</script>

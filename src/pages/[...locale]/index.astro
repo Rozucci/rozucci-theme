@@ -1,0 +1,23 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import type { LocaleCode } from '../../site.config';
+import { localeStaticPaths, useTranslations } from '../../i18n/utils';
+
+export function getStaticPaths() {
+  return localeStaticPaths();
+}
+
+interface Props {
+  locale: LocaleCode;
+}
+
+const { locale } = Astro.props;
+const t = useTranslations(locale);
+---
+
+<BaseLayout locale={locale}>
+  <section class="section section--flush pad pad-block">
+    <p class="t-label u-muted">{t.home.eyebrow}</p>
+    <h1 class="t-display">{t.home.statement}</h1>
+  </section>
+</BaseLayout>

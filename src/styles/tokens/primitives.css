@@ -1,0 +1,183 @@
+/*
+ * Tier 1 — PRIMITIVES
+ *
+ * Raw values only. Nothing outside src/styles/tokens/ and src/styles/themes/
+ * may reference a --p-* variable. Components use the semantic roles from
+ * semantic.css; themes map those roles onto these primitives.
+ *
+ * Naming: --p-<family>-<step>. Steps are lightness-ordered where it makes
+ * sense (50 lightest … 950 darkest).
+ */
+@layer tokens.primitives {
+  :root {
+    /* ---------------------------------------------------------------- *
+     * Colour — warm ivory ramp (placeholder, Anthropic-like warmth)
+     * ---------------------------------------------------------------- */
+    --p-ivory-50: #faf9f5; /* canvas */
+    --p-ivory-100: #f0eee6; /* surface */
+    --p-ivory-200: #e8e6dc; /* raised ground */
+    --p-ivory-300: #d1cfc5; /* line */
+    --p-ivory-400: #b0aea5; /* mid gray */
+    --p-ivory-500: #8a8880; /* strong line / control border */
+    --p-ivory-600: #6b6a64; /* muted ink */
+    --p-ivory-900: #141413; /* ink */
+
+    /* Ivory, night */
+    --p-night-50: #f0eee6;
+    --p-night-200: #a3a199;
+    --p-night-400: #6b6a64;
+    --p-night-600: #4a4945;
+    --p-night-700: #3a3935;
+    --p-night-800: #2c2b28;
+    --p-night-850: #242320;
+    --p-night-900: #1a1917;
+
+    /* Accents (use sparingly — at most one accent per view) */
+    --p-clay-400: #e08a6d;
+    --p-clay-500: #d97757;
+    --p-clay-700: #a64b29; /* text-safe clay on light grounds */
+    --p-olive-500: #788c5d;
+    --p-olive-300: #9aac80;
+    --p-sky-500: #6a9bcc;
+    --p-sky-300: #8fb5dc;
+
+    /* ---------------------------------------------------------------- *
+     * Colour — bone / stone (from the notched-card reference)
+     * ---------------------------------------------------------------- */
+    --p-stone-400: #c2c1bf; /* stone ground */
+    --p-bone-100: #e4e3df; /* bone card */
+    --p-ink-950: #0a0907; /* ink */
+    --p-label-600: #686765; /* label (decorative only on stone) */
+    --p-label-700: #4a4947; /* text-safe label on stone */
+    --p-line-700: #737270; /* line */
+    --p-olive-glass-400: #959579;
+    --p-olive-glass-600: #787862;
+    --p-olive-glass-800: #45452f; /* text-safe olive */
+    --p-sage-glass-500: #6e8975;
+    --p-cap-900: #262626; /* cap */
+    --p-cap-950: #1e1e1d;
+    --p-cap-800: #2e2e2c;
+    --p-cap-700: #3c3c3a;
+    --p-cap-600: #575755;
+    --p-cap-300: #a8a7a4;
+    --p-olive-glass-200: #a9a98d;
+
+    /* ---------------------------------------------------------------- *
+     * Type families (placeholders — see README "Change fonts")
+     * ---------------------------------------------------------------- */
+    --p-font-instrument: 'Instrument Serif';
+    --p-font-inter: 'Inter';
+    --p-font-roboto-mono: 'Roboto Mono';
+    --p-font-vazirmatn: 'Vazirmatn';
+    /* Brand slot: becomes 'Rozucci' once the files are uploaded. */
+    --p-font-brand: var(--p-font-instrument);
+    --p-font-system-sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+    --p-font-system-serif: ui-serif, Georgia, 'Times New Roman', serif;
+    --p-font-system-mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+
+    /* ---------------------------------------------------------------- *
+     * Type scale (rem, fluid where useful)
+     * ---------------------------------------------------------------- */
+    --p-size-11: 0.6875rem;
+    --p-size-12: 0.75rem;
+    --p-size-14: 0.875rem;
+    --p-size-16: 1rem;
+    --p-size-17: 1.0625rem;
+    --p-size-20: 1.25rem;
+    --p-size-fluid-24-32: clamp(1.5rem, 1.25rem + 1vw, 2rem);
+    --p-size-fluid-32-48: clamp(2rem, 1.4rem + 2.4vw, 3rem);
+    --p-size-fluid-40-72: clamp(2.5rem, 1.6rem + 4vw, 4.5rem);
+    --p-size-fluid-48-120: clamp(3rem, 1.2rem + 7.5vw, 7.5rem);
+    --p-size-fluid-56-168: clamp(3.5rem, 0.8rem + 11vw, 10.5rem);
+
+    --p-leading-0-95: 0.95;
+    --p-leading-1-1: 1.1;
+    --p-leading-1-25: 1.25;
+    --p-leading-1-4: 1.4;
+    --p-leading-1-55: 1.55;
+    --p-leading-1-9: 1.9;
+
+    --p-weight-300: 300;
+    --p-weight-400: 400;
+    --p-weight-500: 500;
+    --p-weight-600: 600;
+
+    --p-tracking-0: 0;
+    --p-tracking-tight: -0.02em;
+    --p-tracking-label: 0.08em;
+
+    /* ---------------------------------------------------------------- *
+     * Space (4px base)
+     * ---------------------------------------------------------------- */
+    --p-space-0: 0;
+    --p-space-2: 0.125rem;
+    --p-space-4: 0.25rem;
+    --p-space-8: 0.5rem;
+    --p-space-12: 0.75rem;
+    --p-space-16: 1rem;
+    --p-space-24: 1.5rem;
+    --p-space-32: 2rem;
+    --p-space-48: 3rem;
+    --p-space-64: 4rem;
+    --p-space-96: 6rem;
+    --p-space-128: 8rem;
+    --p-space-fluid-16-40: clamp(1rem, 0.6rem + 1.8vw, 2.5rem);
+    --p-space-fluid-64-160: clamp(4rem, 2rem + 8vw, 10rem);
+
+    /* ---------------------------------------------------------------- *
+     * Lines, radius, sizes
+     * ---------------------------------------------------------------- */
+    --p-line-1: 1px;
+    --p-line-2: 2px;
+
+    --p-radius-0: 0;
+    --p-radius-18: 18px;
+    --p-radius-pill: 999px;
+
+    --p-size-6: 0.375rem;
+    --p-size-8: 0.5rem;
+    --p-size-10: 0.625rem;
+    --p-size-28: 1.75rem;
+    --p-size-44: 2.75rem;
+    --p-size-56: 3.5rem;
+    --p-size-measure: 62ch;
+    --p-size-measure-wide: 78ch;
+    --p-size-container: 90rem;
+
+    --p-ratio-1-1: 1 / 1;
+    --p-ratio-4-5: 4 / 5;
+    --p-ratio-3-2: 3 / 2;
+    --p-ratio-16-9: 16 / 9;
+    --p-ratio-21-9: 21 / 9;
+
+    /* ---------------------------------------------------------------- *
+     * Motion
+     * ---------------------------------------------------------------- */
+    --p-dur-0: 0ms;
+    --p-dur-120: 120ms;
+    --p-dur-200: 200ms;
+    --p-dur-400: 400ms;
+    --p-dur-600: 600ms;
+    --p-dur-1000: 1000ms;
+    --p-dur-1400: 1400ms;
+
+    /* cubic-bezier approximations of GSAP's expo.out / power3.out */
+    --p-ease-expo-out: cubic-bezier(0.16, 1, 0.3, 1);
+    --p-ease-power3-out: cubic-bezier(0.215, 0.61, 0.355, 1);
+    --p-ease-power2-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+    --p-ease-linear: cubic-bezier(0, 0, 1, 1);
+
+    --p-distance-8: 0.5rem;
+    --p-distance-24: 1.5rem;
+    --p-percent-6: 6%;
+    --p-scale-1-06: 1.06;
+
+    /* ---------------------------------------------------------------- *
+     * Layers
+     * ---------------------------------------------------------------- */
+    --p-z-1: 1;
+    --p-z-50: 50;
+    --p-z-100: 100;
+    --p-z-200: 200;
+  }
+}

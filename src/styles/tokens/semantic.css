@@ -1,0 +1,199 @@
+/*
+ * Tier 2 — SEMANTIC ROLES
+ *
+ * The only variables components may read. Each role points at a primitive.
+ *
+ * Colour roles are *declared* here with neutral system-colour fallbacks so a
+ * page never renders with an undefined colour, but every theme in
+ * src/styles/themes/ is expected to define all of them. A theme file wins over
+ * this file because it sits in the later `tokens.themes` layer.
+ */
+@layer tokens.semantic {
+  :root {
+    /* Light/dark follows the OS by default; ThemeToggle sets data-mode. */
+    color-scheme: light dark;
+
+    /* -------- Colour roles (themes override all of these) -------- */
+    --color-canvas: Canvas; /* page ground */
+    --color-surface: Canvas; /* cards, table heads, hover fills */
+    --color-surface-2: Canvas; /* raised / darker ground (NotchCard row) */
+    --color-ink: CanvasText; /* primary text and marks */
+    --color-ink-muted: GrayText; /* secondary text — AA on canvas + surface */
+    --color-ink-subtle: GrayText; /* decorative only: never body text */
+    --color-line: GrayText; /* hairlines */
+    --color-line-strong: CanvasText; /* control borders (≥ 3:1) */
+    --color-accent: Highlight; /* marks, fills, large type */
+    --color-accent-ink: LinkText; /* accent used as small text */
+    --color-on-accent: HighlightText; /* text on an accent fill */
+    --color-accent-2: Highlight; /* secondary accent — sparingly */
+    --color-accent-3: Highlight; /* tertiary accent — sparingly */
+    --color-focus: Highlight; /* focus ring */
+    --color-media: Canvas; /* flat ground behind media */
+    --color-selection: Highlight;
+    --color-on-selection: HighlightText;
+    --color-notch-ground: Canvas; /* darker ground behind NotchCards */
+    --color-notch-card: Canvas; /* the light card */
+    --color-notch-ink: CanvasText;
+    --color-notch-label: GrayText;
+    --color-notch-line: GrayText;
+
+    /* -------- Type -------- */
+    --font-fa: var(--p-font-vazirmatn), var(--p-font-system-sans);
+    --font-display: var(--p-font-brand), var(--p-font-vazirmatn), var(--p-font-system-serif);
+    --font-text: var(--p-font-inter), var(--p-font-vazirmatn), var(--p-font-system-sans);
+    --font-mono: var(--p-font-roboto-mono), var(--p-font-vazirmatn), var(--p-font-system-mono);
+
+    --text-2xs: var(--p-size-11); /* mono labels */
+    --text-xs: var(--p-size-12);
+    --text-sm: var(--p-size-14);
+    --text-base: var(--p-size-17);
+    --text-md: var(--p-size-20);
+    --text-lg: var(--p-size-fluid-24-32);
+    --text-xl: var(--p-size-fluid-32-48);
+    --text-2xl: var(--p-size-fluid-40-72);
+    --text-3xl: var(--p-size-fluid-48-120);
+    --text-display: var(--p-size-fluid-56-168);
+
+    --leading-display: var(--p-leading-0-95);
+    --leading-heading: var(--p-leading-1-1);
+    --leading-snug: var(--p-leading-1-25);
+    --leading-label: var(--p-leading-1-4);
+    --leading-body: var(--p-leading-1-55);
+
+    --weight-display: var(--p-weight-400);
+    --weight-text: var(--p-weight-400);
+    --weight-strong: var(--p-weight-500);
+    --weight-label: var(--p-weight-400);
+
+    --tracking-display: var(--p-tracking-tight);
+    --label-tracking: var(--p-tracking-label);
+
+    /* -------- Space -------- */
+    --space-0: var(--p-space-0);
+    --space-3xs: var(--p-space-2);
+    --space-2xs: var(--p-space-4);
+    --space-xs: var(--p-space-8);
+    --space-sm: var(--p-space-12);
+    --space-md: var(--p-space-16);
+    --space-lg: var(--p-space-24);
+    --space-xl: var(--p-space-32);
+    --space-2xl: var(--p-space-48);
+    --space-3xl: var(--p-space-64);
+    --space-4xl: var(--p-space-96);
+    --space-5xl: var(--p-space-128);
+
+    --gutter: var(--p-space-fluid-16-40);
+    --section-space: var(--p-space-fluid-64-160);
+    --cell-pad: var(--p-space-16);
+    --cell-pad-lg: var(--p-space-24);
+    --container: var(--p-size-container);
+    --measure: var(--p-size-measure);
+    --measure-wide: var(--p-size-measure-wide);
+    --header-h: var(--p-size-56);
+    --hit-target: var(--p-size-44);
+
+    /* -------- Lines & radius -------- */
+    --line-width: var(--p-line-1);
+    --line-width-strong: var(--p-line-2);
+    --radius: var(--p-radius-0);
+    --radius-card: var(--p-radius-18);
+    --radius-pill: var(--p-radius-pill);
+
+    /* -------- Media ratios -------- */
+    --ratio-square: var(--p-ratio-1-1);
+    --ratio-portrait: var(--p-ratio-4-5);
+    --ratio-landscape: var(--p-ratio-3-2);
+    --ratio-wide: var(--p-ratio-16-9);
+    --ratio-cinema: var(--p-ratio-21-9);
+
+    /* -------- NotchCard -------- */
+    --notch-w: var(--p-size-28); /* pill length; half of it cuts into the card */
+    --notch-h: var(--p-size-10); /* pill thickness */
+    --notch-gap: var(--p-space-12); /* distance from media bottom to notch centre */
+    --notch-card-pad: var(--p-space-12);
+    --notch-media-ratio: 1; /* media height ÷ media width (1 = square) */
+    --notch-dot: var(--p-size-6);
+
+    /* -------- Motion -------- */
+    --dur-instant: var(--p-dur-0);
+    --dur-fast: var(--p-dur-200);
+    --dur-medium: var(--p-dur-400);
+    --dur-base: var(--p-dur-600);
+    --dur-slow: var(--p-dur-1000);
+    --dur-slower: var(--p-dur-1400);
+    --dur-hover: var(--p-dur-120);
+
+    --ease-out: var(--p-ease-expo-out); /* expo.out — reveals, draws */
+    --ease-standard: var(--p-ease-power3-out); /* power3.out — UI */
+    --ease-in-out: var(--p-ease-power2-in-out); /* page transitions */
+    --ease-linear: var(--p-ease-linear); /* scrub */
+
+    --motion-distance: var(--p-distance-24); /* reveal offset */
+    --motion-nudge: var(--p-distance-8); /* hover offset */
+    --parallax-amount: var(--p-percent-6);
+    --media-settle-scale: var(--p-scale-1-06);
+    --stagger: 0.06; /* seconds between staggered items (unitless for GSAP) */
+
+    /* -------- Layers -------- */
+    --z-raised: var(--p-z-1);
+    --z-header: var(--p-z-50);
+    --z-overlay: var(--p-z-100);
+    --z-cursor: var(--p-z-200);
+
+    /* -------- Direction helpers (flipped for RTL below) -------- */
+    --origin-inline-start: left;
+    --origin-inline-end: right;
+    --dir-sign: 1;
+  }
+
+  /* Manual mode override from ThemeToggle. */
+  :root[data-mode='light'] {
+    color-scheme: light;
+  }
+
+  :root[data-mode='dark'] {
+    color-scheme: dark;
+  }
+
+  [dir='rtl'] {
+    --origin-inline-start: right;
+    --origin-inline-end: left;
+    --dir-sign: -1;
+  }
+
+  [dir='ltr'] {
+    --origin-inline-start: left;
+    --origin-inline-end: right;
+    --dir-sign: 1;
+  }
+
+  /*
+   * Persian: Vazirmatn leads every stack so spacing and punctuation match the
+   * script; Latin runs fall through to the same face's Latin glyphs.
+   * Letter-spacing is removed — tracking breaks Arabic-script joining.
+   */
+  :lang(fa) {
+    --font-display: var(--p-font-vazirmatn), var(--p-font-brand), var(--p-font-system-sans);
+    --font-text: var(--p-font-vazirmatn), var(--p-font-inter), var(--p-font-system-sans);
+    /* Persian labels set in Vazirmatn (mono spaces are too wide between
+       Persian words). Codes inside them use <bdi lang="en"> → mono again. */
+    --font-mono: var(--p-font-vazirmatn), var(--p-font-roboto-mono), var(--p-font-system-mono);
+    --weight-display: var(--p-weight-300);
+    --leading-display: var(--p-leading-1-25);
+    --leading-heading: var(--p-leading-1-4);
+    --leading-snug: var(--p-leading-1-55);
+    --leading-body: var(--p-leading-1-9);
+    --tracking-display: var(--p-tracking-0);
+    --label-tracking: var(--p-tracking-0);
+  }
+
+  /* Latin islands inside Persian pages get their Latin faces back. */
+  :lang(en) {
+    --font-display: var(--p-font-brand), var(--p-font-vazirmatn), var(--p-font-system-serif);
+    --font-text: var(--p-font-inter), var(--p-font-vazirmatn), var(--p-font-system-sans);
+    --font-mono: var(--p-font-roboto-mono), var(--p-font-vazirmatn), var(--p-font-system-mono);
+    --weight-display: var(--p-weight-400);
+    --tracking-display: var(--p-tracking-tight);
+    --label-tracking: var(--p-tracking-label);
+  }
+}

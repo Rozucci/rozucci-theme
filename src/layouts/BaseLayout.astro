@@ -1,0 +1,60 @@
+---
+/**
+ * BaseLayout — every page renders through this.
+ *
+ * Sets <html lang dir data-theme>, loads global styles, the motion layer
+ * (when enabled) and view transitions (when enabled), and frames the page
+ * between the Header and Footer.
+ */
+import '../styles/global.css';
+import { ClientRouter } from 'astro:transitions';
+import HeadMeta from '../components/HeadMeta.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { site, type LocaleCode } from '../site.config';
+import { getLocaleDef, useTranslations } from '../i18n/utils';
+
+interface Props {
+  locale: LocaleCode;
+  title?: string;
+  description?: string;
+  noindex?: boolean;
+  alternateLocales?: LocaleCode[];
+  /** Hide the site chrome (used by the 404 page). */
+  bare?: boolean;
+  /** Force a direction regardless of locale (style guide preview). */
+  dir?: 'ltr' | 'rtl';
+}
+
+const { locale, title, description, noindex, alternateLocales, bare = false, dir } = Astro.props;
+const def = getLocaleDef(locale);
+const t = useTranslations(locale);
+---
+
+<!doctype html>
+<html lang={def.lang} dir={dir ?? def.dir} data-theme={site.defaultTheme}>
+  <head>
+    <HeadMeta
+      locale={locale}
+      title={title}
+      description={description}
+      noindex={noindex}
+      alternateLocales={alternateLocales}
+    />
+    {site.motion.pageTransitions && <ClientRouter fallback="animate" />}
+    <slot name="head" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">{t.a11y.skipToContent}</a>
+    <div class="container frame">
+      {!bare && <Header locale={locale} />}
+      <main id="main" tabindex="-1">
+        <slot />
+      </main>
+      {!bare && <Footer locale={locale} />}
+    </div>
+    <script>
+      import '../motion/index';
+    </script>
+  </body>
+</html>

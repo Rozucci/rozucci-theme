@@ -1,0 +1,128 @@
+/*
+ * Base element styles. Reads semantic tokens only.
+ */
+@layer base {
+  html {
+    background: var(--color-canvas);
+    color: var(--color-ink);
+    font-family: var(--font-text);
+    font-size: 100%;
+    scroll-padding-block-start: var(--header-h);
+    accent-color: var(--color-accent);
+  }
+
+  body {
+    background: var(--color-canvas);
+    color: var(--color-ink);
+    font-family: var(--font-text);
+    font-size: var(--text-base);
+    font-weight: var(--weight-text);
+    line-height: var(--leading-body);
+    font-synthesis-weight: none;
+    font-variant-numeric: tabular-nums;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    font-weight: var(--weight-display);
+    line-height: var(--leading-heading);
+    letter-spacing: var(--tracking-display);
+    text-wrap: balance;
+  }
+
+  h1 {
+    font-size: var(--text-2xl);
+  }
+
+  h2 {
+    font-size: var(--text-xl);
+  }
+
+  h3 {
+    font-size: var(--text-lg);
+  }
+
+  h4 {
+    font-size: var(--text-md);
+  }
+
+  p,
+  li,
+  dd,
+  blockquote {
+    text-wrap: pretty;
+  }
+
+  a {
+    color: inherit;
+    text-decoration-line: underline;
+    text-decoration-thickness: var(--line-width);
+    text-underline-offset: 0.2em;
+    text-decoration-color: var(--color-line-strong);
+    transition: text-decoration-color var(--dur-hover) var(--ease-standard);
+  }
+
+  a:hover {
+    text-decoration-color: currentColor;
+  }
+
+  :focus-visible {
+    outline: var(--line-width-strong) solid var(--color-focus);
+    outline-offset: var(--line-width-strong);
+  }
+
+  ::selection {
+    background: var(--color-selection);
+    color: var(--color-on-selection);
+  }
+
+  hr {
+    border: 0;
+    block-size: var(--line-width);
+    background: var(--color-line);
+  }
+
+  code,
+  kbd,
+  samp,
+  pre {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+  }
+
+  small {
+    font-size: var(--text-sm);
+  }
+
+  strong,
+  b {
+    font-weight: var(--weight-strong);
+  }
+
+  /* Latin runs inside RTL text never reorder punctuation. */
+  bdi {
+    unicode-bidi: isolate;
+  }
+
+  table {
+    inline-size: 100%;
+  }
+
+  th,
+  td {
+    text-align: start;
+    vertical-align: top;
+  }
+
+  input[type='checkbox'],
+  input[type='radio'] {
+    accent-color: var(--color-ink);
+  }
+
+  :target {
+    scroll-margin-block-start: var(--header-h);
+  }
+}

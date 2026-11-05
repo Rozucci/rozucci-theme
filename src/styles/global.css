@@ -1,0 +1,23 @@
+/*
+ * Global stylesheet entry. Declares the cascade layer order once; every file
+ * below wraps its rules in one of these layers.
+ *
+ *   reset → tokens (primitives → semantic → themes) → base → layout
+ *         → components (each .astro file) → utilities
+ *
+ * Restyle the site: edit src/styles/themes/*.css (colours) and
+ * src/styles/tokens/*.css (type, space, motion). Nothing else.
+ */
+@layer reset, tokens, base, layout, components, utilities;
+@layer tokens.primitives, tokens.semantic, tokens.themes;
+
+@import './fonts.css';
+@import './reset.css';
+@import './tokens/primitives.css';
+@import './tokens/semantic.css';
+@import './themes/ivory.css';
+@import './themes/bone.css';
+@import './base.css';
+@import './layout.css';
+@import './motion.css';
+@import './utilities.css';
